@@ -1,7 +1,7 @@
 import React from 'react';
 import Card from './card.js';
 
-const Grid = ({ words, children }) => (
+const Grid = ({ children }) => (
   <div
     style={{
       display: 'grid',

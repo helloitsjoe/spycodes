@@ -17,15 +17,15 @@ const rules = [
 
 const main = { module: { rules } };
 
-const spymaster = {
-  entry: path.resolve(__dirname, 'spymaster'),
-  output: {
-    path: path.resolve(__dirname, 'dist'),
-    filename: 'spymaster.js',
-  },
-  module: {
-    rules,
-  },
-};
+// const spymaster = {
+//   entry: path.resolve(__dirname, 'spymaster'),
+//   output: {
+//     path: path.resolve(__dirname, 'dist'),
+//     filename: 'spymaster.js',
+//   },
+//   module: {
+//     rules,
+//   },
+// };
 
-module.exports = [main, spymaster];
+module.exports = [main];
