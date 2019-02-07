@@ -21,7 +21,7 @@ const shuffle = array => {
   return array;
 };
 
-export const withColors = ({ boxes }, chance = Math.random()) => {
+export const withColors = ({ boxes, chance = Math.random() }) => {
   const colorDistribution = {
     red: chance < 0.5 ? 8 : 9,
     blue: chance >= 0.5 ? 8 : 9,

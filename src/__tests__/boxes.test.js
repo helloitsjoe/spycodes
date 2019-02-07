@@ -16,7 +16,7 @@ describe('withColors', () => {
     ${'> 0.5 red gets more'}  | ${9} | ${8} | ${0.51}
     ${'0.5 red gets more'}    | ${9} | ${8} | ${0.5}
   `('$description', ({ red, blue, chance }) => {
-    const { boxes } = withColors({ boxes: base }, chance);
+    const { boxes } = withColors({ boxes: base, chance });
     expect(boxes.filter(({ color }) => color === RED).length).toBe(red);
     expect(boxes.filter(({ color }) => color === BLUE).length).toBe(blue);
     expect(boxes.filter(({ color }) => color === BLACK).length).toBe(1);
