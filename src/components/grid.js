@@ -1,5 +1,5 @@
 import React from 'react';
-import Card from './card.js';
+import PropTypes from 'prop-types';
 
 const Grid = ({ children }) => (
   <div
@@ -13,5 +13,9 @@ const Grid = ({ children }) => (
     {children}
   </div>
 );
+
+Grid.propTypes = {
+  children: PropTypes.arrayOf(PropTypes.node).isRequired,
+};
 
 export default Grid;
