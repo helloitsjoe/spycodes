@@ -3,46 +3,66 @@ import React from 'react';
 import App from '../app';
 import Grid from '../components/grid';
 import Card from '../components/card';
-import { colors } from '../boxes';
-import CardContainer from '../components/cardContainer';
+import { colors, makeCards } from '../../server/cardData';
 
-const { RED, BLUE, DEFAULT, BLACK } = colors;
+const { RED, BLUE, DEFAULT, BLACK, YELLOW } = colors;
 
 describe('App', () => {
   describe('player', () => {
-    beforeEach(() => {
-      window.__isSpymaster = null;
-    });
-
     it('all cards have default colors', () => {
-      const wrapper = shallow(<App />);
+      const wrapper = shallow(<App initialCards={makeCards()} />);
       const cards = wrapper.find(Card);
       cards.forEach(card => {
         expect(card.props().color).toBe(colors.DEFAULT);
       });
     });
 
-    it('click reveals card color', () => {
-      const wrapper = shallow(
-        <CardContainer color={colors.RED}>test</CardContainer>
-      );
-      expect(wrapper.find(Card).props().color).toBe(colors.DEFAULT);
-      wrapper.simulate('click');
+    it('click reveals card color, hides word', () => {
+      const singleCard = [{ color: RED, hidden: true, word: 'poo' }];
+      const wrapper = shallow(<App initialCards={singleCard} />);
+      const card = wrapper.find(Card);
+      expect(card.props().color).toBe(colors.DEFAULT);
+      expect(card.props().word).toBe('poo');
+      wrapper.find(Card).simulate('click');
       expect(wrapper.find(Card).props().color).toBe(colors.RED);
+      expect(wrapper.find(Card).props().word).toBe('');
     });
 
     // TODO: Check that click updates other players if multiple devices
   });
 
   describe('spymaster', () => {
-    it('cards have colors', () => {
+    beforeEach(() => {
       window.__isSpymaster = true;
-      const wrapper = mount(<App />);
+    });
+
+    afterEach(() => {
+      window.__isSpymaster = false;
+    });
+
+    it('cards have colors', () => {
+      const wrapper = mount(<App initialCards={makeCards()} />);
       const cards = wrapper.find(Grid).props().children;
       expect(cards.some(card => card.props.color === RED)).toBe(true);
       expect(cards.some(card => card.props.color === BLUE)).toBe(true);
-      expect(cards.some(card => card.props.color === DEFAULT)).toBe(true);
+      expect(cards.some(card => card.props.color === YELLOW)).toBe(true);
+      expect(cards.some(card => card.props.color === DEFAULT)).toBe(false);
       expect(cards.filter(card => card.props.color === BLACK).length).toBe(1);
+    });
+
+    it('clicking card does NOT hide it', () => {
+      const wrapper = mount(<App initialCards={makeCards()} />);
+      const firstCard = wrapper.find(Card).at(0);
+      const { color, word } = firstCard.props();
+      expect(color).not.toBe(DEFAULT);
+      expect(word).not.toBe('');
+      wrapper
+        .find(Card)
+        .at(0)
+        .simulate('click');
+      const firstCardClicked = wrapper.find(Card).at(0);
+      expect(firstCardClicked.props().color).toBe(color);
+      expect(firstCardClicked.props().word).toBe(word);
     });
   });
 });
@@ -50,14 +70,19 @@ describe('App', () => {
 describe('Card', () => {
   it('handles click', () => {
     const onClick = jest.fn();
-    const wrapper = shallow(<Card onClick={onClick}>test</Card>);
+    const wrapper = shallow(<Card onClick={onClick} />);
     expect(onClick).toBeCalledTimes(0);
     wrapper.simulate('click');
     expect(onClick).toBeCalledTimes(1);
   });
 
   it('renders color from prop', () => {
-    const wrapper = shallow(<Card color={RED}>test</Card>);
+    const wrapper = shallow(<Card color={RED} />);
     expect(wrapper.html()).toMatch(RED);
+  });
+
+  it('renders uppercase word from prop', () => {
+    const wrapper = shallow(<Card word="poo" />);
+    expect(wrapper.text()).toMatch('POO');
   });
 });
