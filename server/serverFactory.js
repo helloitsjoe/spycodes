@@ -1,9 +1,16 @@
 const express = require('express');
+const socketIO = require('socket.io');
 const path = require('path');
+const http = require('http');
 const ip = require('ip');
+const { makeCards } = require('./cardData');
 
 const makeServer = (host = 'localhost', port = 3000) => {
   const app = express();
+  const httpServer = http.Server(app);
+  const io = socketIO(httpServer);
+
+  const cards = makeCards();
 
   app.use(express.static(path.join(__dirname, '..')));
 
@@ -15,12 +22,26 @@ const makeServer = (host = 'localhost', port = 3000) => {
     res.sendFile('index.html');
   });
 
-  app.listen(port, () => {
-    console.log(`Listening on http://localhost:${port}`);
+  io.on('connection', socket => {
+    console.log(`A new user connected!`);
+    socket.emit('card-data', cards);
+    socket.on('card-clicked', id => {
+      socket.broadcast.emit('card-clicked', id);
+    });
+    socket.on('request-cards', () => {
+      socket.emit('card-data', cards);
+    });
+    socket.on('disconnect', () => {
+      console.log(`A player disconnected...`);
+    });
+  });
+
+  httpServer.listen(port, () => {
+    console.log(`Listening on http://${host}:${port}`);
     console.log(`Listening on http://${ip.address()}:${port}`);
   });
 
-  return app;
+  return httpServer;
 };
 
 module.exports = {
