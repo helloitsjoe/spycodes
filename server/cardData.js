@@ -1,13 +1,14 @@
-import importedWords from '../resources/words';
+/* eslint-disable */
+const importedWords = require('../resources/words');
 
-// const copiedWords = importedWords.slice();
 const compose = (...args) => data => args.reduce((acc, fn) => fn(acc), data);
 
-export const colors = {
+const colors = {
   RED: '#f55',
   BLUE: '#69d',
   BLACK: '#000',
   WHITE: '#fff',
+  YELLOW: '#bdb76b',
   DEFAULT: '#888',
 };
 
@@ -21,42 +22,47 @@ const shuffle = array => {
   return array;
 };
 
-export const withColors = ({ boxes, chance = Math.random() }) => {
+const withColors = ({ cards, chance = Math.random() }) => {
   const colorDistribution = {
     red: chance < 0.5 ? 8 : 9,
     blue: chance >= 0.5 ? 8 : 9,
     black: 1,
   };
 
-  const colored = boxes.map((box, i) => {
-    const { red, blue, black } = colorDistribution;
+  const colored = cards.map((box, i) => {
+    const { red, blue } = colorDistribution;
     const color =
       i < red
         ? colors.RED
         : i < red + blue
         ? colors.BLUE
-        : i === boxes.length - 1
+        : i === cards.length - 1
         ? colors.BLACK
-        : colors.DEFAULT;
+        : colors.YELLOW;
 
     return { ...box, color };
   });
-  return { boxes: shuffle(colored) };
+  return { cards: shuffle(colored) };
 };
 
-export const withWords = ({ boxes }) => {
+const withWords = ({ cards }) => {
   const words = shuffle([...importedWords]);
-  const worded = boxes.map((box, i) => {
-    return { ...box, word: words.pop() };
-  });
-  return { boxes: shuffle(worded) };
+  const worded = cards.map((box, i) => ({ ...box, word: words.pop() }));
+  return { cards: shuffle(worded) };
 };
 
-export const getBoxes = (length = LENGTH) => {
+const makeCards = (length = LENGTH) => {
   const composed = compose(
     withColors,
     withWords
-  )({ boxes: Array(length).fill({}) });
+  )({ cards: Array(length).fill({}) });
 
-  return composed.boxes;
+  return composed.cards;
+};
+
+module.exports = {
+  colors,
+  withWords,
+  withColors,
+  makeCards,
 };
