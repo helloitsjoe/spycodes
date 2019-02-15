@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import Grid from './components/grid';
 import Card from './components/card';
 import { colors } from '../server/cardData';
-import Socket from './socket';
+import SocketAPI from './socket';
 
 class App extends Component {
   isSpymaster = window && window.__isSpymaster;
@@ -13,31 +13,31 @@ class App extends Component {
   };
 
   static propTypes = {
-    socket: PropTypes.shape(Socket),
+    socketAPI: PropTypes.shape(SocketAPI),
     initialCards: PropTypes.arrayOf(
       PropTypes.shape({ color: PropTypes.string, word: PropTypes.string })
     ),
   };
 
   static defaultProps = {
-    socket: null,
+    socketAPI: null,
     initialCards: [],
   };
 
   componentDidMount() {
-    const { socket, initialCards } = this.props;
-    if (socket) {
-      socket.getCards().then(cards => this.setState({ cards: cards.map(this.hideAll) }));
-      socket.onCardClicked(this.toggleHidden);
+    const { socketAPI, initialCards } = this.props;
+    if (socketAPI) {
+      socketAPI.getCards().then(cards => this.setState({ cards: cards.map(this.hideAll) }));
+      socketAPI.onCardClicked(this.toggleHidden);
     } else {
       this.setState({ cards: initialCards.map(this.hideAll) });
     }
   }
 
   componentWillUnmount() {
-    const { socket } = this.props;
-    if (socket) {
-      socket.close();
+    const { socketAPI } = this.props;
+    if (socketAPI) {
+      socketAPI.close();
     }
   }
 
@@ -56,9 +56,9 @@ class App extends Component {
 
   handleClick = word => {
     this.toggleHidden(word);
-    const { socket } = this.props;
-    if (socket) {
-      socket.clickCard(word);
+    const { socketAPI } = this.props;
+    if (socketAPI) {
+      socketAPI.clickCard(word);
     }
   };
 

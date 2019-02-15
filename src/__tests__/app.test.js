@@ -79,10 +79,23 @@ describe('Card', () => {
   it('renders color from prop', () => {
     const wrapper = shallow(<Card color={RED} />);
     expect(wrapper.html()).toMatch(RED);
+    expect(wrapper.text()).toBe('');
   });
 
   it('renders uppercase word from prop', () => {
     const wrapper = shallow(<Card word="poo" />);
     expect(wrapper.text()).toMatch('POO');
+  });
+
+  it('renders text full size at width >= 800px', () => {
+    window.innerWidth = 800;
+    const wrapper = shallow(<Card word="poo" />);
+    expect(wrapper.html()).toMatch('font-size:1rem');
+  });
+
+  it('renders text half size at width < 800px', () => {
+    window.innerWidth = 799;
+    const wrapper = shallow(<Card word="poo" />);
+    expect(wrapper.html()).toMatch('font-size:0.5rem');
   });
 });

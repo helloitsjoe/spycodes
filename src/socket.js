@@ -1,7 +1,7 @@
 // eslint-disable-next-line
 import io from 'socket.io-client';
 
-export default class Socket {
+export default class SocketAPI {
   constructor({ host = 'localhost', port = 3000 } = {}) {
     const url = port && `http://${host}:${port}`;
     this.socket = io(url);

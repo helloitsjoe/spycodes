@@ -32,7 +32,7 @@ Card.propTypes = {
 
 Card.defaultProps = {
   color: colors.DEFAULT,
-  onClick: () => {},
+  onClick: null,
   word: '',
 };
 
