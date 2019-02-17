@@ -1,6 +1,3 @@
-const webpack = require('webpack');
-const path = require('path');
-
 const rules = [
   {
     test: /\.js$/,
@@ -12,6 +9,10 @@ const rules = [
         plugins: ['@babel/plugin-proposal-class-properties'],
       },
     },
+  },
+  {
+    test: /\.css$/,
+    use: [{ loader: 'style-loader' }, { loader: 'css-loader', options: { modules: true } }],
   },
 ];
 

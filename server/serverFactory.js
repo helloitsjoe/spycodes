@@ -7,8 +7,8 @@ const { makeCards } = require('./cardData');
 
 const makeServer = (host = 'localhost', port = 3000) => {
   const app = express();
-  const httpServer = http.Server(app);
-  const io = socketIO(httpServer);
+  const httpServer = http.createServer(app);
+  const io = socketIO(httpServer, { serveClient: false });
 
   const cards = makeCards();
 

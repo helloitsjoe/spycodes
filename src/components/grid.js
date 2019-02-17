@@ -2,15 +2,17 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 const Grid = ({ children }) => (
-  <div
-    style={{
-      display: 'grid',
-      gridTemplateColumns: 'repeat(5, 18%)',
-      justifyContent: 'center',
-      gridGap: '10px',
-    }}
-  >
-    {children}
+  <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+    <div
+      style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(5, 18%)',
+        justifyContent: 'center',
+        gridGap: '10px',
+      }}
+    >
+      {children}
+    </div>
   </div>
 );
 

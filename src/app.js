@@ -10,6 +10,8 @@ class App extends Component {
 
   state = {
     cards: [],
+    error: null,
+    debug: 'nothing...',
   };
 
   static propTypes = {
@@ -27,7 +29,9 @@ class App extends Component {
   componentDidMount() {
     const { socketAPI, initialCards } = this.props;
     if (socketAPI) {
-      socketAPI.getCards().then(cards => this.setState({ cards: cards.map(this.hideAll) }));
+      socketAPI
+        .getCards()
+        .then(cards => this.setState({ cards: cards.map(this.hideAll), debug: 'Got cards' }));
       socketAPI.onCardClicked(this.toggleHidden);
     } else {
       this.setState({ cards: initialCards.map(this.hideAll) });
@@ -66,9 +70,28 @@ class App extends Component {
 
   getWord = ({ hidden, word }) => (this.isSpymaster || hidden ? word : '');
 
+  getAnimation = ({ hidden }) => this.isSpymaster || !hidden;
+
+  componentDidCatch(error) {
+    this.setState({ error });
+  }
+
   render() {
+    if (this.state.error) {
+      return (
+        <div>
+          Error!
+          {this.state.error.message}
+        </div>
+      );
+    }
     if (!this.state.cards.length) {
-      return <div>Loading...</div>;
+      return (
+        <div>
+          Loading... Debug:
+          {this.state.debug}
+        </div>
+      );
     }
     return (
       <Grid>
@@ -77,6 +100,7 @@ class App extends Component {
             key={word}
             word={this.getWord({ word, hidden })}
             color={this.getColor({ color, hidden })}
+            animation={this.getAnimation({ hidden })}
             onClick={() => this.handleClick(word)}
           />
         ))}
