@@ -8,7 +8,8 @@ import card from './card.css';
 const Card = ({ color, word, animation, onClick }) => (
   // eslint-disable-next-line
   <div
-    className={[card.card, animation && card.flip].join(' ')}
+    // className={[card.card, animation && card.flip].join(' ')}
+    className={[card.card, animation ? card.front : card.back].join(' ')}
     onClick={onClick}
     style={{ backgroundColor: color }}
   >
