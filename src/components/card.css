@@ -11,10 +11,6 @@
   line-height: 80px;
 }
 
-.flip {
-  animation: flip 0.3s;
-}
-
 .back {
   transition: all 0.3s;
   transform: translateY(0px) rotate3d(0, 0, 0, 0deg);

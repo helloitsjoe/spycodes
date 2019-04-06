@@ -39,8 +39,8 @@ describe('App', () => {
         .at(0)
         .simulate('click');
       const cardsAfterClick = wrapper.find(Card);
-      expect(cardsAfterClick.at(0).html()).toMatch('flip');
-      expect(cardsAfterClick.at(1).html()).not.toMatch('flip');
+      expect(cardsAfterClick.at(0).html()).toMatch('front');
+      expect(cardsAfterClick.at(1).html()).not.toMatch('front');
     });
 
     // TODO: Check that click updates other players if multiple devices
