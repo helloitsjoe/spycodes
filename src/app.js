@@ -16,33 +16,22 @@ class App extends Component {
 
   static propTypes = {
     socketAPI: PropTypes.shape(SocketAPI),
-    initialCards: PropTypes.arrayOf(
-      PropTypes.shape({ color: PropTypes.string, word: PropTypes.string })
-    ),
   };
 
   static defaultProps = {
-    socketAPI: null,
-    initialCards: [],
+    socketAPI: new SocketAPI(),
   };
 
   componentDidMount() {
-    const { socketAPI, initialCards } = this.props;
-    if (socketAPI) {
-      socketAPI
-        .getCards()
-        .then(cards => this.setState({ cards: cards.map(this.hideAll), debug: 'Got cards' }));
-      socketAPI.onCardClicked(this.toggleHidden);
-    } else {
-      this.setState({ cards: initialCards.map(this.hideAll) });
-    }
+    const { socketAPI } = this.props;
+    socketAPI
+      .getCards()
+      .then(cards => this.setState({ cards: cards.map(this.hideAll), debug: 'Got cards' }));
+    socketAPI.onCardClicked(this.toggleHidden);
   }
 
   componentWillUnmount() {
-    const { socketAPI } = this.props;
-    if (socketAPI) {
-      socketAPI.close();
-    }
+    this.props.socketAPI.close();
   }
 
   hideAll = card => ({ ...card, hidden: true });
@@ -60,10 +49,7 @@ class App extends Component {
 
   handleClick = word => {
     this.toggleHidden(word);
-    const { socketAPI } = this.props;
-    if (socketAPI) {
-      socketAPI.clickCard(word);
-    }
+    this.props.socketAPI.clickCard(word);
   };
 
   getColor = ({ hidden, color }) => (this.isSpymaster || !hidden ? color : colors.DEFAULT);
