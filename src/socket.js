@@ -35,5 +35,6 @@ export default class SocketAPI {
 
   close() {
     this.socket.removeAllListeners();
+    this.socket.disconnect(true);
   }
 }

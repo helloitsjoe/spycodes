@@ -5,6 +5,7 @@ module.exports = {
     jest: true,
   },
   parser: 'babel-eslint',
+  plugins: ['react-hooks'],
   rules: {
     quotes: 'off',
     'no-console': 'off',
@@ -15,6 +16,8 @@ module.exports = {
     'no-prototype-builtins': 'off',
     'react/jsx-filename-extension': 'off',
     'react/destructuring-assignment': 'off',
+    'react-hooks/rules-of-hooks': 'error',
+    'react-hooks/exhaustive-deps': 'warn',
     'arrow-parens': ['error', 'as-needed'],
     'comma-dangle': ['error', 'only-multiline'],
   },

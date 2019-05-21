@@ -1,5 +1,6 @@
 import { mount, shallow } from 'enzyme';
 import React from 'react';
+import waitForExpect from 'wait-for-expect';
 import App from '../app';
 import Grid from '../components/grid';
 import Card from '../components/card';
@@ -8,12 +9,12 @@ import SocketAPI from '../socket';
 
 const { RED, BLUE, DEFAULT, BLACK, YELLOW } = colors;
 
-const wait = () => new Promise(resolve => setTimeout(resolve, 0));
+const wait = (ms = 0) => new Promise(resolve => setTimeout(resolve, ms));
 
 describe('App', () => {
   describe('player', () => {
     it('all cards have default colors', () => {
-      const wrapper = shallow(<App initialCards={makeCards()} />);
+      const wrapper = shallow(<App socketAPI={new SocketAPI(makeCards())} />);
       const cards = wrapper.update().find(Card);
       cards.forEach(card => {
         expect(card.props().color).toBe(colors.DEFAULT);
@@ -22,8 +23,11 @@ describe('App', () => {
 
     it('click reveals card color, hides word', () => {
       const singleCard = [{ color: RED, hidden: true, word: 'poo' }];
-      const wrapper = shallow(<App socketAPI={new SocketAPI(singleCard)} />);
-      return wait().then(() => {
+      const wrapper = mount(<App socketAPI={new SocketAPI(singleCard)} />);
+      return waitForExpect(() => {
+        wrapper.update();
+        expect(wrapper.find(Card).exists()).toBe(true);
+      }).then(() => {
         const card = wrapper.find(Card);
         expect(card.props().color).toBe(colors.DEFAULT);
         expect(card.props().word).toBe('poo');
@@ -38,8 +42,11 @@ describe('App', () => {
         { color: RED, hidden: true, word: 'poo' },
         { color: BLUE, hidden: true, word: 'bloo' },
       ];
-      const wrapper = shallow(<App socketAPI={new SocketAPI(cards)} />);
-      return wait().then(() => {
+      const wrapper = mount(<App socketAPI={new SocketAPI(cards)} />);
+      return waitForExpect(() => {
+        wrapper.update();
+        expect(wrapper.find(Card).exists()).toBe(true);
+      }).then(() => {
         wrapper
           .find(Card)
           .at(0)
