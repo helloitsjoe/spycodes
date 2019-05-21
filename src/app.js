@@ -76,7 +76,7 @@ App.defaultProps = {
   socketAPI: new SocketAPI(),
 };
 
-function Fallback({ loading, error, cards }) {
+export function Fallback({ loading, error, cards }) {
   const style = error ? { color: 'red' } : {};
   let fallbackText;
   if (loading) {
@@ -85,6 +85,8 @@ function Fallback({ loading, error, cards }) {
     fallbackText = `Error! ${error.message}`;
   } else if (!cards.length) {
     fallbackText = 'No cards!';
+  } else {
+    fallbackText = 'Something weird happened.';
   }
   return <div style={style}>{fallbackText}</div>;
 }
@@ -93,14 +95,12 @@ Fallback.propTypes = {
   cards: PropTypes.arrayOf(PropTypes.objectOf(PropTypes.string)),
   loading: PropTypes.bool,
   error: PropTypes.string,
-  debug: PropTypes.string,
 };
 
 Fallback.defaultProps = {
   cards: [],
   loading: true,
   error: null,
-  debug: '',
 };
 
 export default App;

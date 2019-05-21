@@ -2,12 +2,12 @@
 import io from 'socket.io-client';
 
 export default class SocketAPI {
-  constructor(cardData) {
+  constructor(cardData, socket = io()) {
     // Thought I had to include host/port in io() but apparently not?
     // constructor({ host = 'localhost', port = 3000 } = {}) {
     // const url = port && `http://${host}:${port}`;
     // this.socket = io(url);
-    this.socket = io();
+    this.socket = socket;
 
     this.socket.on('card-clicked', word => console.log('someone clicked', word));
     this.onCardClicked = this.socket.on.bind(this.socket, 'card-clicked');
