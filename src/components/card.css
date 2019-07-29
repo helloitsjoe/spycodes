@@ -23,6 +23,30 @@
   color: rgba(255, 255, 255, 0);
 }
 
+.red {
+  background-color: '#f55';
+}
+
+.blue {
+  background-color: '#69d';
+}
+
+.black {
+  background-color: '#000';
+}
+
+.white {
+  background-color: '#fff';
+}
+
+.yellow {
+  background-color: '#bdb76b';
+}
+
+.default {
+  background-color: '#888';
+}
+
 /* .flip {
   animation: flip 0.3s;
 } */

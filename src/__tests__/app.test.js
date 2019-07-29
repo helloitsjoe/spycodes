@@ -1,5 +1,5 @@
-import { mount, shallow } from 'enzyme';
 import React from 'react';
+import { render, cleanup, findAllByTestId, findByTestId, fireEvent } from '@testing-library/react';
 import waitForExpect from 'wait-for-expect';
 import App, { Fallback } from '../app';
 import Grid from '../components/grid';
@@ -9,92 +9,75 @@ import SocketAPI from '../socket';
 
 const { RED, BLUE, DEFAULT, BLACK, YELLOW } = colors;
 
-const wait = (ms = 0) => new Promise(resolve => setTimeout(resolve, ms));
+afterEach(cleanup);
 
 describe('App', () => {
   describe('player', () => {
     it('loads cards', () => {
-      const wrapper = mount(<App socketAPI={new SocketAPI(makeCards())} />);
-      expect(wrapper.text()).toBe('Loading...');
-      expect(wrapper.find(Card).exists()).toBe(false);
+      const singleCard = [{ color: RED, hidden: true, word: 'poo' }];
+      const { container, getByTestId } = render(<App socketAPI={new SocketAPI(singleCard)} />);
+      expect(container.textContent).toBe('Loading...');
       return waitForExpect(() => {
-        wrapper.update();
-        expect(wrapper.find(Card).exists()).toBe(true);
+        expect(getByTestId('card').textContent).toBe('POO');
       });
     });
 
     it('displays "No cards!" if no cards are fetched', () => {
-      const wrapper = mount(<App socketAPI={new SocketAPI([])} />);
-      expect(wrapper.text()).toBe('Loading...');
-      expect(wrapper.find(Card).exists()).toBe(false);
+      const { container, queryByTestId } = render(<App socketAPI={new SocketAPI([])} />);
       return waitForExpect(() => {
-        wrapper.update();
-        expect(wrapper.find(Card).exists()).toBe(false);
-        expect(wrapper.text()).toBe('No cards!');
+        expect(container.textContent).toBe('No cards!');
+        expect(queryByTestId('card')).toBe(null);
       });
     });
 
     it('displays "Error" if error while fetching', () => {
-      const mockSocket = { getCards: () => Promise.reject(new Error('No!')) };
-      const wrapper = mount(<App socketAPI={mockSocket} />);
-      expect(wrapper.text()).toBe('Loading...');
-      expect(wrapper.find(Card).exists()).toBe(false);
+      const mockSocket = { close() {}, getCards: () => Promise.reject(new Error('No!')) };
+      const { container, queryByTestId } = render(<App socketAPI={mockSocket} />);
       return waitForExpect(() => {
-        wrapper.update();
-        expect(wrapper.find(Card).exists()).toBe(false);
-        expect(wrapper.text()).toBe('Error! No!');
+        expect(queryByTestId('card')).toBe(null);
+        expect(container.textContent).toBe('Error! No!');
       });
     });
 
     it('all cards have default colors', () => {
-      const wrapper = shallow(<App socketAPI={new SocketAPI(makeCards())} />);
-      const cards = wrapper.update().find(Card);
-      cards.forEach(card => {
-        expect(card.props().color).toBe(colors.DEFAULT);
+      const { container } = render(<App socketAPI={new SocketAPI(makeCards())} />);
+      return findAllByTestId(container, 'card').then(cards => {
+        cards.forEach(card => {
+          expect(card.className).toBe('card back default');
+        });
       });
     });
 
     it('click reveals card color, hides word', () => {
       const singleCard = [{ color: RED, hidden: true, word: 'poo' }];
-      const wrapper = mount(<App socketAPI={new SocketAPI(singleCard)} />);
-      return waitForExpect(() => {
-        wrapper.update();
-        expect(wrapper.find(Card).exists()).toBe(true);
-      }).then(() => {
-        const card = wrapper.find(Card);
-        expect(card.props().color).toBe(colors.DEFAULT);
-        expect(card.props().word).toBe('poo');
-        wrapper.find(Card).simulate('click');
-        expect(wrapper.find(Card).props().color).toBe(colors.RED);
-        expect(wrapper.find(Card).props().word).toBe('');
+      const { container } = render(<App socketAPI={new SocketAPI(singleCard)} />);
+      return findByTestId(container, 'card').then(card => {
+        expect(card.className).toBe('card back default');
+        expect(card.textContent).toBe('POO');
+        fireEvent.click(card);
+        expect(card.className).toBe('card front red');
+        expect(card.textContent).toBe('');
       });
     });
 
     it('click plays flip animation', () => {
-      const cards = [
+      const mockCards = [
         { color: RED, hidden: true, word: 'poo' },
         { color: BLUE, hidden: true, word: 'bloo' },
       ];
-      const wrapper = mount(<App socketAPI={new SocketAPI(cards)} />);
-      return waitForExpect(() => {
-        wrapper.update();
-        expect(wrapper.find(Card).exists()).toBe(true);
-      }).then(() => {
-        wrapper
-          .find(Card)
-          .at(0)
-          .simulate('click');
-        const cardsAfterClick = wrapper.find(Card);
-        expect(cardsAfterClick.at(0).html()).toMatch('front');
-        expect(cardsAfterClick.at(1).html()).not.toMatch('front');
+      const { container } = render(<App socketAPI={new SocketAPI(mockCards)} />);
+      return findAllByTestId(container, 'card').then(cards => {
+        fireEvent.click(cards[0]);
+        expect(cards[0].className).toMatch('front');
+        expect(cards[1].className).not.toMatch('front');
       });
     });
 
     it('socket is closed on unmount', () => {
       const mockSocket = { close: jest.fn(), getCards: jest.fn(() => Promise.resolve()) };
-      const wrapper = mount(<App socketAPI={mockSocket} />);
+      const { unmount } = render(<App socketAPI={mockSocket} />);
       expect(mockSocket.close).toBeCalledTimes(0);
-      wrapper.unmount();
+      unmount();
       expect(mockSocket.close).toBeCalledTimes(1);
     });
 
@@ -111,30 +94,30 @@ describe('App', () => {
     });
 
     it('cards have colors', () => {
-      const wrapper = mount(<App socketAPI={new SocketAPI(makeCards())} />);
-      return wait().then(() => {
-        const grid = wrapper.update().find(Grid);
-        const cards = grid.props().children;
-        expect(cards.some(card => card.props.color === RED)).toBe(true);
-        expect(cards.some(card => card.props.color === BLUE)).toBe(true);
-        expect(cards.some(card => card.props.color === YELLOW)).toBe(true);
-        expect(cards.some(card => card.props.color === DEFAULT)).toBe(false);
-        expect(cards.filter(card => card.props.color === BLACK).length).toBe(1);
+      const { container, queryAllByTestId } = render(
+        <App socketAPI={new SocketAPI(makeCards())} />
+      );
+      return findByTestId(container, 'grid').then(() => {
+        const cards = queryAllByTestId('card');
+        expect(cards.some(card => card.className.match(RED))).toBe(true);
+        expect(cards.some(card => card.className.match(BLUE))).toBe(true);
+        expect(cards.some(card => card.className.match(YELLOW))).toBe(true);
+        expect(cards.some(card => card.className.match(DEFAULT))).toBe(false);
+        expect(cards.filter(card => card.className.match(BLACK)).length).toBe(1);
       });
     });
 
     it('clicking card does NOT hide it', () => {
-      const wrapper = mount(<App socketAPI={new SocketAPI(makeCards())} />);
-      return wait().then(() => {
-        wrapper.update();
-        const firstCard = wrapper.find(Card).at(0);
-        const { color, word } = firstCard.props();
-        expect(color).not.toBe(DEFAULT);
-        expect(word).not.toBe('');
-        firstCard.simulate('click');
-        const firstCardClicked = wrapper.find(Card).at(0);
-        expect(firstCardClicked.props().color).toBe(color);
-        expect(firstCardClicked.props().word).toBe(word);
+      const { container, queryAllByTestId } = render(
+        <App socketAPI={new SocketAPI(makeCards())} />
+      );
+      return findByTestId(container, 'grid').then(() => {
+        const [firstCard] = queryAllByTestId('card');
+        expect(firstCard.className).not.toMatch(DEFAULT);
+        expect(firstCard.textContent).not.toBe('');
+        fireEvent.click(firstCard);
+        expect(firstCard.className).not.toMatch(DEFAULT);
+        expect(firstCard.textContent).not.toBe('');
       });
     });
   });
@@ -142,61 +125,61 @@ describe('App', () => {
 
 describe('Fallback', () => {
   it('loading is true by default', () => {
-    const wrapper = shallow(<Fallback />);
-    expect(wrapper.text()).toBe('Loading...');
+    const { container } = render(<Fallback />);
+    expect(container.textContent).toBe('Loading...');
   });
 
   it('loading state displays "Loading..."', () => {
-    const wrapper = shallow(<Fallback loading />);
-    expect(wrapper.text()).toBe('Loading...');
+    const { container } = render(<Fallback loading />);
+    expect(container.textContent).toBe('Loading...');
   });
 
   it('error state displays "Error! <Text>"', () => {
     const error = new Error('Blah');
-    const wrapper = shallow(<Fallback loading={false} error={error} />);
-    expect(wrapper.text()).toBe('Error! Blah');
+    const { container } = render(<Fallback loading={false} error={error} />);
+    expect(container.textContent).toBe('Error! Blah');
   });
 
   it('no cards displays "No cards!"', () => {
-    const wrapper = shallow(<Fallback loading={false} cards={[]} />);
-    expect(wrapper.text()).toBe('No cards!');
+    const { container } = render(<Fallback loading={false} cards={[]} />);
+    expect(container.textContent).toBe('No cards!');
   });
 
   it('no cards displays "No cards!"', () => {
-    const wrapper = shallow(<Fallback loading={false} cards={[1]} />);
-    expect(wrapper.text()).toBe('Something weird happened.');
+    const { container } = render(<Fallback loading={false} cards={[1]} />);
+    expect(container.textContent).toBe('Something weird happened.');
   });
 });
 
 describe('Card', () => {
   it('handles click', () => {
     const onClick = jest.fn();
-    const wrapper = shallow(<Card onClick={onClick} />);
+    const { getByTestId } = render(<Card onClick={onClick} />);
     expect(onClick).toBeCalledTimes(0);
-    wrapper.simulate('click');
+    fireEvent.click(getByTestId('card'));
     expect(onClick).toBeCalledTimes(1);
   });
 
   it('renders color from prop', () => {
-    const wrapper = shallow(<Card color={RED} />);
-    expect(wrapper.html()).toMatch(RED);
-    expect(wrapper.text()).toBe('');
+    const { getByTestId } = render(<Card color={RED} />);
+    expect(getByTestId('card').className).toMatch(RED);
+    expect(getByTestId('card').textContent).toBe('');
   });
 
   it('renders uppercase word from prop', () => {
-    const wrapper = shallow(<Card word="poo" />);
-    expect(wrapper.text()).toMatch('POO');
+    const { getByTestId } = render(<Card word="poo" />);
+    expect(getByTestId('card').textContent).toMatch('POO');
   });
 
   // it('renders text full size at width >= 400px', () => {
   //   window.innerWidth = 400;
-  //   const wrapper = shallow(<Card word="poo" />);
+  //   const {container} = render(<Card word="poo" />);
   //   expect(wrapper.html()).toMatch('font-size:1rem');
   // });
 
   // it('renders text half size at width < 400px', () => {
   //   window.innerWidth = 399;
-  //   const wrapper = shallow(<Card word="poo" />);
+  //   const {container} = render(<Card word="poo" />);
   //   expect(wrapper.html()).toMatch('font-size:0.5rem');
   // });
 });
