@@ -7,7 +7,7 @@
     "start": "nodemon server",
     "build": "webpack --mode development",
     "watch": "npm run build -- --watch",
-    "test": "jest --verbose --coverage"
+    "test": "jest --silent --verbose --coverage"
   },
   "keywords": [],
   "author": "",
@@ -17,12 +17,11 @@
     "@babel/plugin-proposal-class-properties": "^7.3.0",
     "@babel/preset-env": "^7.3.1",
     "@babel/preset-react": "^7.0.0",
+    "@testing-library/react": "^8.0.7",
     "babel-eslint": "^10.0.1",
     "babel-jest": "^24.1.0",
     "babel-loader": "^8.0.5",
     "css-loader": "^2.1.0",
-    "enzyme": "^3.9.0",
-    "enzyme-adapter-react-16": "^1.9.1",
     "eslint": "^5.13.0",
     "eslint-config-airbnb": "^17.1.0",
     "eslint-plugin-import": "^2.16.0",
@@ -47,11 +46,7 @@
   },
   "jest": {
     "testPathIgnorePatterns": [
-      "./src/__tests__/setup.js",
       "./coverage"
-    ],
-    "setupFilesAfterEnv": [
-      "./src/__tests__/setup.js"
     ],
     "moduleNameMapper": {
       "\\.(css|less)$": "identity-obj-proxy"

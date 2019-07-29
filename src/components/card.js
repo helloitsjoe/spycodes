@@ -10,10 +10,9 @@ function Card({ color, word, animation, onClick }) {
     // eslint-disable-next-line
     <div
       // className={[card.card, animation && card.flip].join(' ')}
-      data-enzyme-id="card"
-      className={[card.card, animation ? card.front : card.back].join(' ')}
+      data-testid="card"
+      className={[card.card, animation ? card.front : card.back, color].join(' ')}
       onClick={onClick}
-      style={{ backgroundColor: color }}
     >
       {word && word.toUpperCase()}
     </div>

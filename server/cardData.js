@@ -4,12 +4,12 @@ const importedWords = require('../resources/words');
 const compose = (...args) => data => args.reduce((acc, fn) => fn(acc), data);
 
 const colors = {
-  RED: '#f55',
-  BLUE: '#69d',
-  BLACK: '#000',
-  WHITE: '#fff',
-  YELLOW: '#bdb76b',
-  DEFAULT: '#888',
+  RED: 'red',
+  BLUE: 'blue',
+  BLACK: 'black',
+  WHITE: 'white',
+  YELLOW: 'yellow',
+  DEFAULT: 'default',
 };
 
 const LENGTH = 25;
