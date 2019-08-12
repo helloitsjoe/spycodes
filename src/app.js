@@ -12,18 +12,21 @@ function App({ socketAPI }) {
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  const getColor = ({ hidden, color }) => (isSpymaster || !hidden ? color : colors.DEFAULT);
+  const getColor = ({ hidden, color }) =>
+    isSpymaster || !hidden ? color : colors.DEFAULT;
   const getWord = ({ hidden, word }) => (isSpymaster || hidden ? word : '');
   const getAnimation = ({ hidden }) => isSpymaster || !hidden;
   const hideCard = card => ({ ...card, hidden: true });
 
   const toggleHidden = word => {
-    setCards(c => c.map(card => {
-      if (card.word === word) {
-        return { ...card, hidden: !card.hidden };
-      }
-      return card;
-    }));
+    setCards(c =>
+      c.map(card => {
+        if (card.word === word) {
+          return { ...card, hidden: !card.hidden };
+        }
+        return card;
+      })
+    );
   };
 
   useLayoutEffect(
@@ -79,10 +82,10 @@ App.defaultProps = {
 export function Fallback({ loading, error, cards }) {
   const style = error ? { color: 'red' } : {};
   let fallbackText;
-  if (loading) {
-    fallbackText = `Loading...`;
-  } else if (error) {
+  if (error) {
     fallbackText = `Error! ${error.message}`;
+  } else if (loading) {
+    fallbackText = `Loading...`;
   } else if (!cards.length) {
     fallbackText = 'No cards!';
   } else {
