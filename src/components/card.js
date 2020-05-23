@@ -3,8 +3,6 @@ import PropTypes from 'prop-types';
 import { colors } from '../../server/cardData';
 import card from './card.css';
 
-// const HEIGHT = 80;
-
 function Card({ color, word, animation, onClick }) {
   return (
     // eslint-disable-next-line

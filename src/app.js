@@ -2,6 +2,7 @@ import React, { useState, useLayoutEffect } from 'react';
 import PropTypes from 'prop-types';
 import Grid from './components/grid';
 import Card from './components/card';
+import Fallback from './components/fallback';
 import { colors } from '../server/cardData';
 import SocketAPI from './socket';
 
@@ -12,8 +13,7 @@ function App({ socketAPI }) {
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  const getColor = ({ hidden, color }) =>
-    isSpymaster || !hidden ? color : colors.DEFAULT;
+  const getColor = ({ hidden, color }) => (isSpymaster || !hidden ? color : colors.DEFAULT);
   const getWord = ({ hidden, word }) => (isSpymaster || hidden ? word : '');
   const getAnimation = ({ hidden }) => isSpymaster || !hidden;
   const hideCard = card => ({ ...card, hidden: true });
@@ -29,25 +29,22 @@ function App({ socketAPI }) {
     );
   };
 
-  useLayoutEffect(
-    () => {
-      setLoading(true);
-      socketAPI
-        .getCards()
-        .then(fetchedCards => {
-          setLoading(false);
-          setCards(fetchedCards.map(hideCard));
-          socketAPI.onCardClicked(toggleHidden);
-        })
-        .catch(err => {
-          setLoading(false);
-          setError(err);
-        });
+  useLayoutEffect(() => {
+    setLoading(true);
+    socketAPI
+      .getCards()
+      .then(fetchedCards => {
+        setLoading(false);
+        setCards(fetchedCards.map(hideCard));
+        socketAPI.onCardClicked(toggleHidden);
+      })
+      .catch(err => {
+        setLoading(false);
+        setError(err);
+      });
 
-      return () => socketAPI.close();
-    },
-    [socketAPI]
-  );
+    return () => socketAPI.close();
+  }, [socketAPI]);
 
   const handleClick = word => {
     toggleHidden(word);
@@ -77,33 +74,6 @@ App.propTypes = {
 
 App.defaultProps = {
   socketAPI: new SocketAPI(),
-};
-
-export function Fallback({ loading, error, cards }) {
-  const style = error ? { color: 'red' } : {};
-  let fallbackText;
-  if (error) {
-    fallbackText = `Error! ${error.message}`;
-  } else if (loading) {
-    fallbackText = `Loading...`;
-  } else if (!cards.length) {
-    fallbackText = 'No cards!';
-  } else {
-    fallbackText = 'Something weird happened.';
-  }
-  return <div style={style}>{fallbackText}</div>;
-}
-
-Fallback.propTypes = {
-  cards: PropTypes.arrayOf(PropTypes.objectOf(PropTypes.string)),
-  loading: PropTypes.bool,
-  error: PropTypes.string,
-};
-
-Fallback.defaultProps = {
-  cards: [],
-  loading: true,
-  error: null,
 };
 
 export default App;
