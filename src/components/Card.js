@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { colors } from '../../server/cardData';
-import card from './card.css';
+import card from './Card.css';
 
 function Card({ color, word, animation, onClick }) {
   return (

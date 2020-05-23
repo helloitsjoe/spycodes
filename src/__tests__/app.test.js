@@ -1,9 +1,9 @@
 /* eslint-disable indent */
 import React from 'react';
 import { render, cleanup, fireEvent, wait } from '@testing-library/react';
-import App from '../app';
-import Fallback from '../components/fallback';
-import Card from '../components/card';
+import App from '../App';
+import Fallback from '../components/Fallback';
+import Card from '../components/Card';
 import { colors, makeCards } from '../../server/cardData';
 import SocketAPI from '../socket';
 

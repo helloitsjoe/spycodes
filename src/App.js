@@ -1,8 +1,8 @@
 import React, { useState, useLayoutEffect } from 'react';
 import PropTypes from 'prop-types';
-import Grid from './components/grid';
-import Card from './components/card';
-import Fallback from './components/fallback';
+import Grid from './components/Grid';
+import Card from './components/Card';
+import Fallback from './components/Fallback';
 import { colors } from '../server/cardData';
 import SocketAPI from './socket';
 
