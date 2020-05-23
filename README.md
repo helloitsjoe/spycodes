@@ -1,3 +1,8 @@
-# Codenames
+# Criss Angel's SPYFREAKS
 
-Codenames for mobile
+TODO:
+- [ ] Rename repo
+- [ ] CrissAngelize board
+  - [ ] Audio
+  - [ ] Pictures
+  - [ ] GeoCities
