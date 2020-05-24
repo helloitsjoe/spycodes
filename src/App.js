@@ -35,6 +35,7 @@ function App({ socketAPI }) {
       .getCards()
       .then(fetchedCards => {
         setLoading(false);
+        console.log(`fetchedCards:`, fetchedCards);
         setCards(fetchedCards.map(hideCard));
         socketAPI.onCardClicked(toggleHidden);
       })

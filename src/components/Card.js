@@ -7,9 +7,9 @@ function Card({ color, word, animation, onClick }) {
   return (
     // eslint-disable-next-line
     <div
-      // className={[card.card, animation && card.flip].join(' ')}
+      // className={[card.card, animation && card.flip, card[color]].join(' ')}
       data-testid="card"
-      className={[card.card, animation ? card.front : card.back, color].join(' ')}
+      className={[card.card, animation ? card.front : card.back, card[color]].join(' ')}
       onClick={onClick}
     >
       {word && word.toUpperCase()}
