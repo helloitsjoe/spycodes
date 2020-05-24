@@ -3,8 +3,17 @@ import Socket from '../socket';
 describe('Socket', () => {
   const cardData = [{ color: 'blue', word: 'yes' }];
   const mockSocket = {
-    on: jest.fn(),
-    emit: jest.fn(),
+    listeners: [],
+    on: jest.fn(function on(name, callback) {
+      this.listeners.push({ name, callback });
+    }),
+    emit: jest.fn(function emit(name, data) {
+      this.listeners.forEach(listener => {
+        if (listener.name === name) {
+          listener.callback(data);
+        }
+      });
+    }),
     removeAllListeners: jest.fn(),
     disconnect: jest.fn(),
   };
@@ -38,12 +47,14 @@ describe('Socket', () => {
       expect(mockSocket.on.mock.calls[1]).toContain('card-data');
     });
 
-    xit('sets card data on socket', async () => {
-      // mockSocket.on.mockRestore();
-      // socket = new Socket(null);
-      // const cards = await socket.getCards();
-      // expect(cards).toEqual(cardData);
-    });
+    it('sets card data on socket', async done => {
+      const socket = new Socket(null, mockSocket);
+      socket.getCards().then(cards => {
+        expect(cards).toEqual(cardData);
+        done();
+      });
+      mockSocket.emit('card-data', cardData);
+    }, 200);
   });
 
   describe('#clickCard', () => {
