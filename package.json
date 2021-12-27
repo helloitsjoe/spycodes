@@ -39,7 +39,7 @@
   },
   "husky": {
     "hooks": {
-      "pre-push": "npm t"
+      "pre-push": "yarn test"
     }
   },
   "jest": {
