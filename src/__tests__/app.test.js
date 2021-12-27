@@ -1,22 +1,23 @@
 /* eslint-disable indent */
 import React from 'react';
-import { render, cleanup, fireEvent, wait } from '@testing-library/react';
+import { render, fireEvent, waitFor } from '@testing-library/react';
 import App from '../App';
 import Fallback from '../components/Fallback';
 import Card from '../components/Card';
-import { colors, makeCards } from '../../server/cardData';
-import SocketAPI from '../socket';
+import { colors, makeCards } from '../cardData';
+import { makeApi } from '../api';
+
+jest.mock('firebase/firestore');
+jest.mock('../firebase');
 
 const { RED, BLUE, DEFAULT, BLACK, YELLOW } = colors;
-
-afterEach(cleanup);
 
 describe('App', () => {
   describe('player', () => {
     it('loads cards', () => {
       const singleCard = [{ color: RED, hidden: true, word: 'poo' }];
       const { container, findByTestId } = render(
-        <App socketAPI={new SocketAPI(singleCard)} />
+        <App api={makeApi(singleCard, null)} />
       );
       expect(container.textContent).toBe('Loading...');
       return findByTestId('card').then(card => {
@@ -25,32 +26,29 @@ describe('App', () => {
     });
 
     it('displays "No cards!" if no cards are fetched', () => {
-      const { container, queryByTestId } = render(
-        <App socketAPI={new SocketAPI([])} />
-      );
-      return wait(() => {
+      const { container, queryByTestId } = render(<App api={makeApi([])} />);
+      return waitFor(() => {
         expect(container.textContent).toBe('No cards!');
         expect(queryByTestId('card')).toBe(null);
       });
     });
 
     it('displays "Error" if error while fetching', () => {
-      const mockSocket = {
+      const mockApi = {
+        init() {},
         close() {},
-        getCards: () => Promise.reject(new Error('No!')),
+        onCardUpdates: fn => fn(new Error('No!')),
+        clickCard: () => {},
       };
-      const { container, queryByTestId } = render(
-        <App socketAPI={mockSocket} />
-      );
-      return wait(() => {
+      const { container, queryByTestId } = render(<App api={mockApi} />);
+      return waitFor(() => {
         expect(container.textContent).toBe('Error! No!');
         expect(queryByTestId('card')).toBe(null);
       });
     });
 
     it('all cards have default colors', () => {
-      const socket = new SocketAPI(makeCards());
-      const { findAllByTestId } = render(<App socketAPI={socket} />);
+      const { findAllByTestId } = render(<App api={makeApi(makeCards())} />);
       return findAllByTestId('card').then(cards => {
         expect(cards.every(card => card.className.match('back default')));
       });
@@ -58,8 +56,7 @@ describe('App', () => {
 
     it('click reveals card color', () => {
       const singleCard = [{ color: RED, hidden: true, word: 'poo' }];
-      const socket = new SocketAPI(singleCard);
-      const { findByText } = render(<App socketAPI={socket} />);
+      const { findByText } = render(<App api={makeApi(singleCard)} />);
       return findByText('POO').then(card => {
         expect(card.className).toBe('card back default');
         fireEvent.click(card);
@@ -73,8 +70,7 @@ describe('App', () => {
         { color: RED, hidden: true, word: 'poo' },
         { color: BLUE, hidden: true, word: 'bloo' },
       ];
-      const socket = new SocketAPI(mockCards);
-      const { findAllByTestId } = render(<App socketAPI={socket} />);
+      const { findAllByTestId } = render(<App api={makeApi(mockCards)} />);
       return findAllByTestId('card').then(cards => {
         fireEvent.click(cards[0]);
         expect(cards[0].className).toMatch('front');
@@ -82,32 +78,30 @@ describe('App', () => {
       });
     });
 
-    it('socket is closed on unmount', () => {
-      const mockSocket = {
+    it('api.close is called on unmount', () => {
+      const mockApi = {
+        init: jest.fn(),
         close: jest.fn(),
-        getCards: jest.fn(() => Promise.resolve()),
+        onCardUpdates: fn => fn(null, []),
+        clickCard: () => {},
       };
-      const { unmount } = render(<App socketAPI={mockSocket} />);
-      expect(mockSocket.close).toBeCalledTimes(0);
-      unmount();
-      expect(mockSocket.close).toBeCalledTimes(1);
+      const { unmount } = render(<App api={mockApi} />);
+      return waitFor(() => {
+        expect(mockApi.close).toBeCalledTimes(0);
+      }).then(() => {
+        unmount();
+        expect(mockApi.close).toBeCalledTimes(1);
+      });
     });
 
     // TODO: Check that click updates other players if multiple devices
+    it.todo('clicking New Game button initializes a new game');
   });
 
   describe('spymaster', () => {
-    beforeEach(() => {
-      window.__isSpymaster = true;
-    });
-
-    afterEach(() => {
-      window.__isSpymaster = false;
-    });
-
     it('cards have colors', () => {
       const { findAllByTestId } = render(
-        <App socketAPI={new SocketAPI(makeCards())} />
+        <App api={makeApi(makeCards())} isSpymaster />
       );
       return findAllByTestId('card').then(cards => {
         const matchesColor = color => card => card.className.match(color);
@@ -121,7 +115,7 @@ describe('App', () => {
 
     it('clicking card does NOT hide it', () => {
       const { findAllByTestId } = render(
-        <App socketAPI={new SocketAPI(makeCards())} />
+        <App api={makeApi(makeCards())} isSpymaster />
       );
       return findAllByTestId('card').then(([firstCard]) => {
         expect(firstCard.className).not.toMatch(DEFAULT);
@@ -136,12 +130,12 @@ describe('App', () => {
 
 describe('Fallback', () => {
   it.each`
-    description                               | props                             | text
-    ${'loading is true by default'}           | ${{}}                             | ${'Loading...'}
-    ${'loading state displays "Loading..."'}  | ${{ loading: true }}              | ${'Loading...'}
-    ${'error state displays "Error! <Text>"'} | ${{ error: new Error('Blah') }}   | ${'Error! Blah'}
-    ${'no cards displays "No cards!"'}        | ${{ loading: false, cards: [] }}  | ${'No cards!'}
-    ${'unknown state displays message'}       | ${{ loading: false, cards: [1] }} | ${'Something weird happened.'}
+    description                               | props                              | text
+    ${'loading is true by default'}           | ${{}}                              | ${'Loading...'}
+    ${'loading state displays "Loading..."'}  | ${{ loading: true }}               | ${'Loading...'}
+    ${'error state displays "Error! <Text>"'} | ${{ error: new Error('Blah') }}    | ${'Error! Blah'}
+    ${'no cards displays "No cards!"'}        | ${{ loading: false, cards: [] }}   | ${'No cards!'}
+    ${'unknown state displays message'}       | ${{ loading: false, cards: [{}] }} | ${'Something weird happened.'}
   `('$description', ({ props, text }) => {
     const { container } = render(<Fallback {...props} />);
     expect(container.textContent).toBe(text);

@@ -1,7 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { colors } from '../../server/cardData';
-import card from './Card.css';
+import { colors } from '../cardData';
 
 function Card({ color, word, animation, onClick }) {
   return (
@@ -9,11 +8,7 @@ function Card({ color, word, animation, onClick }) {
     <div
       // className={[card.card, animation && card.flip, card[color]].join(' ')}
       data-testid="card"
-      className={[
-        card.card,
-        animation ? card.front : card.back,
-        card[color],
-      ].join(' ')}
+      className={['card', animation ? 'front' : 'back', color].join(' ')}
       onClick={onClick}
     >
       {word && word.toUpperCase()}

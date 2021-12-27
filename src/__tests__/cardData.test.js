@@ -1,4 +1,4 @@
-import { withColors, withWords, makeCards, colors } from '../../server/cardData';
+import { withColors, withWords, makeCards, colors } from '../cardData';
 
 const { RED, BLUE, BLACK, DEFAULT, YELLOW } = colors;
 
@@ -17,13 +17,13 @@ describe('withColors', () => {
     ${'> 0.5 red gets more'}  | ${9} | ${8} | ${0.51}
     ${'0.5 red gets more'}    | ${9} | ${8} | ${0.5}
   `('$description', ({ red, blue, chance }) => {
-  const { cards } = withColors({ cards: base, chance });
-  expect(cards.filter(({ color }) => color === RED).length).toBe(red);
-  expect(cards.filter(({ color }) => color === BLUE).length).toBe(blue);
-  expect(cards.filter(({ color }) => color === BLACK).length).toBe(1);
-  expect(cards.filter(({ color }) => color === YELLOW).length).toBe(7);
-  expect(cards.filter(({ color }) => color === DEFAULT).length).toBe(0);
-});
+    const { cards } = withColors({ cards: base, chance });
+    expect(cards.filter(({ color }) => color === RED).length).toBe(red);
+    expect(cards.filter(({ color }) => color === BLUE).length).toBe(blue);
+    expect(cards.filter(({ color }) => color === BLACK).length).toBe(1);
+    expect(cards.filter(({ color }) => color === YELLOW).length).toBe(7);
+    expect(cards.filter(({ color }) => color === DEFAULT).length).toBe(0);
+  });
 
   it('shuffles cards', () => {
     const { cards } = withColors({ cards: base });
@@ -44,9 +44,12 @@ describe('withWords', () => {
 
 describe('withCards', () => {
   it('adds words and colors', () => {
-    const cards = makeCards();
-    expect(cards).toMatchObject(base);
-    expect(cards.every(card => card.hasOwnProperty('color')));
-    expect(cards.every(card => card.hasOwnProperty('word')));
+    const cardsEntries = Object.entries(makeCards());
+    cardsEntries.forEach(([key, value]) => {
+      expect(key).toBe(value.word);
+      expect(value.word).toEqual(expect.any(String));
+      expect(value.color).toEqual(expect.any(String));
+      expect(value.hidden).toBe(true);
+    });
   });
 });

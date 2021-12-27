@@ -1,31 +1,15 @@
-const main = {
-  module: {
-    rules: [
-      {
-        test: /\.js$/,
-        exclude: [/.json?/, /node_modules/],
-        use: {
-          loader: 'babel-loader',
-          options: {
-            presets: ['@babel/preset-env', '@babel/preset-react'],
-            plugins: ['@babel/plugin-proposal-class-properties'],
-          },
-        },
-      },
-      {
-        test: /\.css$/,
-        use: [
-          {
-            loader: 'style-loader',
-          },
-          {
-            loader: 'css-loader',
-            options: { modules: true },
-          },
-        ],
-      },
-    ],
-  },
-};
+const { makeWebpackConfig } = require('webpack-simple');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
 
-module.exports = [main];
+module.exports = makeWebpackConfig({
+  plugins: [
+    new HtmlWebpackPlugin({
+      template: 'index.template.html',
+      filename: 'index.html',
+    }),
+    new HtmlWebpackPlugin({
+      template: 'index.template.html',
+      filename: 'freakmaster/index.html',
+    }),
+  ],
+});

@@ -3,26 +3,22 @@ import PropTypes from 'prop-types';
 import Grid from './components/Grid';
 import Card from './components/Card';
 import Fallback from './components/Fallback';
-import { colors } from '../server/cardData';
-import SocketAPI from './socket';
+import { colors } from './cardData';
+import { makeApi } from './api';
 
-function App({ socketAPI }) {
-  const isSpymaster = window && window.__isSpymaster;
+const isFreakmaster =
+  window && window.location.pathname.includes('freakmaster');
 
+function App({ api, isSpymaster = isFreakmaster }) {
   const [cards, setCards] = useState([]);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  // TODO: Show words for spymaster
   const getColor = ({ hidden, color }) =>
     isSpymaster || !hidden ? color : colors.DEFAULT;
 
-  // const getWord = ({ hidden, word }) => (isSpymaster || hidden ? word : '');
-  const getWord = ({ word }) => word;
   const getAnimation = ({ hidden }) => isSpymaster || !hidden;
-  const hideCard = card => ({ ...card, hidden: true });
-
-  const toggleHidden = word => {
+  const toggleHidden = ({ word }) => {
     setCards(c =>
       c.map(card => {
         if (card.word === word) {
@@ -35,50 +31,59 @@ function App({ socketAPI }) {
 
   useLayoutEffect(() => {
     setLoading(true);
-    socketAPI
-      .getCards()
-      .then(fetchedCards => {
-        setLoading(false);
-        console.log(`fetchedCards:`, fetchedCards);
-        setCards(fetchedCards.map(hideCard));
-        socketAPI.onCardClicked(toggleHidden);
-      })
-      .catch(err => {
-        setLoading(false);
+    api.onCardUpdates((err, newCards) => {
+      setLoading(false);
+      if (err) {
         setError(err);
-      });
+        return;
+      }
+      setCards(newCards);
+    });
 
-    return () => socketAPI.close();
-  }, [socketAPI]);
+    return () => api.close();
+  }, [api]);
 
-  const handleClick = word => {
-    toggleHidden(word);
-    socketAPI.clickCard(word);
+  const handleClick = card => {
+    const hidden = !card.hidden;
+    toggleHidden(card);
+    api.clickCard({ ...card, hidden });
   };
 
   return loading || error || !cards.length ? (
     <Fallback loading={loading} error={error} cards={cards} />
   ) : (
-    <Grid>
-      {cards.map(({ word, color, hidden }) => (
-        <Card
-          key={word}
-          word={getWord({ word, hidden })}
-          color={getColor({ color, hidden })}
-          animation={getAnimation({ hidden })}
-          onClick={() => handleClick(word)}
-        />
-      ))}
-    </Grid>
+    <>
+      <Grid>
+        {cards.map(({ word, color, hidden }) => (
+          <Card
+            key={word}
+            word={word}
+            color={getColor({ color, hidden })}
+            animation={getAnimation({ hidden })}
+            onClick={() => handleClick({ word, color, hidden })}
+          />
+        ))}
+      </Grid>
+      <button type="button" onClick={api.init}>
+        New game
+      </button>
+    </>
   );
 }
 
 App.propTypes = {
-  socketAPI: PropTypes.shape(SocketAPI),
+  api: PropTypes.shape({
+    init: PropTypes.func.isRequired,
+    close: PropTypes.func.isRequired,
+    clickCard: PropTypes.func.isRequired,
+    onCardUpdates: PropTypes.func.isRequired,
+  }),
+  isSpymaster: PropTypes.bool,
 };
 
 App.defaultProps = {
-  socketAPI: new SocketAPI(),
+  api: makeApi(),
+  isSpymaster: false,
 };
 
 export default App;
