@@ -1,7 +1,7 @@
 import Socket from '../socket';
 
 // TODO: Convert this to db tests
-describe('Socket', () => {
+xdescribe('Socket', () => {
   const cardData = [{ color: 'blue', word: 'yes' }];
   const mockSocket = {
     listeners: [],

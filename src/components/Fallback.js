@@ -21,7 +21,7 @@ function Fallback({ loading, error, cards }) {
 Fallback.propTypes = {
   cards: PropTypes.arrayOf(PropTypes.objectOf(PropTypes.string)),
   loading: PropTypes.bool,
-  error: PropTypes.string,
+  error: PropTypes.shape({ message: PropTypes.string }),
 };
 
 Fallback.defaultProps = {

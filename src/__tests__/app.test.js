@@ -37,6 +37,7 @@ describe('App', () => {
       const mockApi = {
         close() {},
         getCards: () => Promise.reject(new Error('No!')),
+        clickCard: () => {},
       };
       const { container, queryByTestId } = render(<App api={mockApi} />);
       return waitFor(() => {
@@ -80,11 +81,15 @@ describe('App', () => {
       const mockApi = {
         close: jest.fn(),
         getCards: jest.fn(() => Promise.resolve()),
+        clickCard: () => {},
       };
       const { unmount } = render(<App api={mockApi} />);
-      expect(mockApi.close).toBeCalledTimes(0);
-      unmount();
-      expect(mockApi.close).toBeCalledTimes(1);
+      return waitFor(() => {
+        expect(mockApi.close).toBeCalledTimes(0);
+      }).then(() => {
+        unmount();
+        expect(mockApi.close).toBeCalledTimes(1);
+      });
     });
 
     // TODO: Check that click updates other players if multiple devices
@@ -126,12 +131,12 @@ describe('App', () => {
 
 describe('Fallback', () => {
   it.each`
-    description                               | props                             | text
-    ${'loading is true by default'}           | ${{}}                             | ${'Loading...'}
-    ${'loading state displays "Loading..."'}  | ${{ loading: true }}              | ${'Loading...'}
-    ${'error state displays "Error! <Text>"'} | ${{ error: new Error('Blah') }}   | ${'Error! Blah'}
-    ${'no cards displays "No cards!"'}        | ${{ loading: false, cards: [] }}  | ${'No cards!'}
-    ${'unknown state displays message'}       | ${{ loading: false, cards: [1] }} | ${'Something weird happened.'}
+    description                               | props                              | text
+    ${'loading is true by default'}           | ${{}}                              | ${'Loading...'}
+    ${'loading state displays "Loading..."'}  | ${{ loading: true }}               | ${'Loading...'}
+    ${'error state displays "Error! <Text>"'} | ${{ error: new Error('Blah') }}    | ${'Error! Blah'}
+    ${'no cards displays "No cards!"'}        | ${{ loading: false, cards: [] }}   | ${'No cards!'}
+    ${'unknown state displays message'}       | ${{ loading: false, cards: [{}] }} | ${'Something weird happened.'}
   `('$description', ({ props, text }) => {
     const { container } = render(<Fallback {...props} />);
     expect(container.textContent).toBe(text);
