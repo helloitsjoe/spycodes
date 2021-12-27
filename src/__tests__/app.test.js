@@ -4,8 +4,8 @@ import { render, cleanup, fireEvent, wait } from '@testing-library/react';
 import App from '../App';
 import Fallback from '../components/Fallback';
 import Card from '../components/Card';
-import { colors, makeCards } from '../../server/cardData';
-import SocketAPI from '../socket';
+import { colors, makeCards } from '../cardData';
+import { makeApi } from '../db';
 
 const { RED, BLUE, DEFAULT, BLACK, YELLOW } = colors;
 
@@ -16,7 +16,7 @@ describe('App', () => {
     it('loads cards', () => {
       const singleCard = [{ color: RED, hidden: true, word: 'poo' }];
       const { container, findByTestId } = render(
-        <App socketAPI={new SocketAPI(singleCard)} />
+        <App api={makeApi(singleCard)} />
       );
       expect(container.textContent).toBe('Loading...');
       return findByTestId('card').then(card => {
@@ -25,9 +25,7 @@ describe('App', () => {
     });
 
     it('displays "No cards!" if no cards are fetched', () => {
-      const { container, queryByTestId } = render(
-        <App socketAPI={new SocketAPI([])} />
-      );
+      const { container, queryByTestId } = render(<App api={makeApi([])} />);
       return wait(() => {
         expect(container.textContent).toBe('No cards!');
         expect(queryByTestId('card')).toBe(null);
@@ -35,13 +33,11 @@ describe('App', () => {
     });
 
     it('displays "Error" if error while fetching', () => {
-      const mockSocket = {
+      const mockApi = {
         close() {},
         getCards: () => Promise.reject(new Error('No!')),
       };
-      const { container, queryByTestId } = render(
-        <App socketAPI={mockSocket} />
-      );
+      const { container, queryByTestId } = render(<App api={mockApi} />);
       return wait(() => {
         expect(container.textContent).toBe('Error! No!');
         expect(queryByTestId('card')).toBe(null);
@@ -49,8 +45,7 @@ describe('App', () => {
     });
 
     it('all cards have default colors', () => {
-      const socket = new SocketAPI(makeCards());
-      const { findAllByTestId } = render(<App socketAPI={socket} />);
+      const { findAllByTestId } = render(<App api={makeApi(makeCards())} />);
       return findAllByTestId('card').then(cards => {
         expect(cards.every(card => card.className.match('back default')));
       });
@@ -58,8 +53,7 @@ describe('App', () => {
 
     it('click reveals card color', () => {
       const singleCard = [{ color: RED, hidden: true, word: 'poo' }];
-      const socket = new SocketAPI(singleCard);
-      const { findByText } = render(<App socketAPI={socket} />);
+      const { findByText } = render(<App api={makeApi(singleCard)} />);
       return findByText('POO').then(card => {
         expect(card.className).toBe('card back default');
         fireEvent.click(card);
@@ -73,8 +67,7 @@ describe('App', () => {
         { color: RED, hidden: true, word: 'poo' },
         { color: BLUE, hidden: true, word: 'bloo' },
       ];
-      const socket = new SocketAPI(mockCards);
-      const { findAllByTestId } = render(<App socketAPI={socket} />);
+      const { findAllByTestId } = render(<App api={makeApi(mockCards)} />);
       return findAllByTestId('card').then(cards => {
         fireEvent.click(cards[0]);
         expect(cards[0].className).toMatch('front');
@@ -82,15 +75,15 @@ describe('App', () => {
       });
     });
 
-    it('socket is closed on unmount', () => {
-      const mockSocket = {
+    it('api.close is called on unmount', () => {
+      const mockApi = {
         close: jest.fn(),
         getCards: jest.fn(() => Promise.resolve()),
       };
-      const { unmount } = render(<App socketAPI={mockSocket} />);
-      expect(mockSocket.close).toBeCalledTimes(0);
+      const { unmount } = render(<App api={mockApi} />);
+      expect(mockApi.close).toBeCalledTimes(0);
       unmount();
-      expect(mockSocket.close).toBeCalledTimes(1);
+      expect(mockApi.close).toBeCalledTimes(1);
     });
 
     // TODO: Check that click updates other players if multiple devices
@@ -106,9 +99,7 @@ describe('App', () => {
     });
 
     it('cards have colors', () => {
-      const { findAllByTestId } = render(
-        <App socketAPI={new SocketAPI(makeCards())} />
-      );
+      const { findAllByTestId } = render(<App api={makeApi(makeCards())} />);
       return findAllByTestId('card').then(cards => {
         const matchesColor = color => card => card.className.match(color);
         expect(cards.some(matchesColor(RED))).toBe(true);
@@ -120,9 +111,7 @@ describe('App', () => {
     });
 
     it('clicking card does NOT hide it', () => {
-      const { findAllByTestId } = render(
-        <App socketAPI={new SocketAPI(makeCards())} />
-      );
+      const { findAllByTestId } = render(<App api={makeApi(makeCards())} />);
       return findAllByTestId('card').then(([firstCard]) => {
         expect(firstCard.className).not.toMatch(DEFAULT);
         expect(firstCard.textContent).not.toBe('');

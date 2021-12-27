@@ -1,19 +1,13 @@
 /* eslint-disable import/prefer-default-export */
-import {
-  getFirestore,
-  onSnapshot,
-  setDoc,
-  doc,
-  getDoc,
-} from 'firebase/firestore';
+import { getFirestore, onSnapshot, setDoc, doc } from 'firebase/firestore';
 import firebaseApp from './firebase';
 import { makeCards } from './cardData';
 
-export const makeApi = (app = firebaseApp) => {
+export const makeApi = (cards = makeCards(), app = firebaseApp) => {
   const db = getFirestore(app);
-  let unsub = null;
+  let unsub = () => {};
 
-  const init = (cards = makeCards()) => {
+  const init = () => {
     return new Promise((resolve, reject) => {
       // TODO: Handle more than one game
       // Generate cards, set in db
@@ -44,6 +38,11 @@ export const makeApi = (app = firebaseApp) => {
     // });
 
     return new Promise((resolve, reject) => {
+      if (cards) {
+        resolve(cards);
+        return;
+      }
+
       unsub = onSnapshot(
         doc(db, 'cards/current'),
         newCards => {
