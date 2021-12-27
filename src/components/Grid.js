@@ -2,23 +2,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 const Grid = ({ children }) => (
-  <div
-    style={{
-      display: 'flex',
-      justifyContent: 'center',
-      alignItems: 'center',
-      margin: '2em',
-    }}
-  >
-    <div
-      data-testid="grid"
-      style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(5, 18%)',
-        justifyContent: 'center',
-        gridGap: '10px',
-      }}
-    >
+  <div className="grid-container">
+    <div data-testid="grid" className="grid">
       {children}
     </div>
   </div>
