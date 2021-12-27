@@ -37,20 +37,6 @@
     "webpack-dev-server": "^3.11.2",
     "webpack-simple": "^1.7.3"
   },
-  "husky": {
-    "hooks": {
-      "pre-push": "yarn test"
-    }
-  },
-  "jest": {
-    "testPathIgnorePatterns": [
-      "./coverage"
-    ],
-    "moduleNameMapper": {
-      "\\.(css|less)$": "identity-obj-proxy"
-    },
-    "testEnvironment": "jsdom"
-  },
   "dependencies": {
     "firebase": "^9.6.1",
     "jest-simple-config": "^0.4.0",
