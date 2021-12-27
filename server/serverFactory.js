@@ -38,10 +38,20 @@ const makeServer = (host = 'localhost', port = 3000) => {
   });
 
   httpServer.listen(port, () => {
-    console.log(chalk.yellow(`Players, open a browser to http://${host}:${port}`));
-    console.log(chalk.yellow(`Spymaster, open a browser to http://${host}:${port}/spymaster`));
-    console.log(chalk.magenta(`To play on another device: http://${ip.address()}:${port}`));
-    console.log(chalk.magenta(`Spymaster: http://${ip.address()}:${port}/spymaster`));
+    console.log(
+      chalk.yellow(`Players, open a browser to http://${host}:${port}`)
+    );
+    console.log(
+      chalk.yellow(
+        `Spymaster, open a browser to http://${host}:${port}/spymaster`
+      )
+    );
+    console.log(
+      chalk.magenta(`To play on another device: http://${ip.address()}:${port}`)
+    );
+    console.log(
+      chalk.magenta(`Spymaster: http://${ip.address()}:${port}/spymaster`)
+    );
   });
 
   return httpServer;

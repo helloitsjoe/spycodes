@@ -1,5 +1,4 @@
-/* eslint-disable */
-const importedWords = require('../resources/words');
+const { official } = require('../resources/words.json');
 
 const compose = (...args) => data => args.reduce((acc, fn) => fn(acc), data);
 
@@ -31,14 +30,12 @@ const withColors = ({ cards, chance = Math.random() }) => {
 
   const colored = cards.map((box, i) => {
     const { red, blue } = colorDistribution;
-    const color =
-      i < red
-        ? colors.RED
-        : i < red + blue
-        ? colors.BLUE
-        : i === cards.length - 1
-        ? colors.BLACK
-        : colors.YELLOW;
+    const color = (() => {
+      if (i < red) return colors.RED;
+      if (i < red + blue) return colors.BLUE;
+      if (i === cards.length - 1) return colors.BLACK;
+      return colors.YELLOW;
+    })();
 
     return { ...box, color };
   });
@@ -46,7 +43,7 @@ const withColors = ({ cards, chance = Math.random() }) => {
 };
 
 const withWords = ({ cards }) => {
-  const words = shuffle([...importedWords]);
+  const words = shuffle([...official]);
   const worded = cards.map((box, i) => ({ ...box, word: words.pop() }));
   return { cards: shuffle(worded) };
 };

@@ -19,8 +19,8 @@
 
 .front {
   transition: all 0.3s;
-  transform: translateY(0px) rotate3d(0, 1, 0, 180deg);
-  color: rgba(255, 255, 255, 0);
+  /* transform: translateY(0px) rotate3d(0, 1, 0, 180deg); */
+  /* color: rgba(255, 255, 255, 0); */
 }
 
 .red {

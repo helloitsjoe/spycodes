@@ -14,8 +14,11 @@ function App({ socketAPI }) {
   const [loading, setLoading] = useState(false);
 
   // TODO: Show words for spymaster
-  const getColor = ({ hidden, color }) => (isSpymaster || !hidden ? color : colors.DEFAULT);
-  const getWord = ({ hidden, word }) => (isSpymaster || hidden ? word : '');
+  const getColor = ({ hidden, color }) =>
+    isSpymaster || !hidden ? color : colors.DEFAULT;
+
+  // const getWord = ({ hidden, word }) => (isSpymaster || hidden ? word : '');
+  const getWord = ({ word }) => word;
   const getAnimation = ({ hidden }) => isSpymaster || !hidden;
   const hideCard = card => ({ ...card, hidden: true });
 
