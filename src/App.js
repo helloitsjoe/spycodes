@@ -6,9 +6,10 @@ import Fallback from './components/Fallback';
 import { colors } from './cardData';
 import { makeApi } from './db';
 
-function App({ api }) {
-  const isSpymaster = window && window.__isSpymaster;
+const isFreakmaster =
+  window && window.location.pathname.includes('freakmaster');
 
+function App({ api, isSpymaster = isFreakmaster }) {
   const [cards, setCards] = useState([]);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);

@@ -96,16 +96,10 @@ describe('App', () => {
   });
 
   describe('spymaster', () => {
-    beforeEach(() => {
-      window.__isSpymaster = true;
-    });
-
-    afterEach(() => {
-      window.__isSpymaster = false;
-    });
-
     it('cards have colors', () => {
-      const { findAllByTestId } = render(<App api={makeApi(makeCards())} />);
+      const { findAllByTestId } = render(
+        <App api={makeApi(makeCards())} isSpymaster />
+      );
       return findAllByTestId('card').then(cards => {
         const matchesColor = color => card => card.className.match(color);
         expect(cards.some(matchesColor(RED))).toBe(true);
@@ -117,7 +111,9 @@ describe('App', () => {
     });
 
     it('clicking card does NOT hide it', () => {
-      const { findAllByTestId } = render(<App api={makeApi(makeCards())} />);
+      const { findAllByTestId } = render(
+        <App api={makeApi(makeCards())} isSpymaster />
+      );
       return findAllByTestId('card').then(([firstCard]) => {
         expect(firstCard.className).not.toMatch(DEFAULT);
         expect(firstCard.textContent).not.toBe('');

@@ -1,5 +1,12 @@
 // eslint-disable-next-line
-import io from 'socket.io-client';
+// import io from 'socket.io-client';
+
+const io = () => ({
+  on() {},
+  emit() {},
+  removeAllListeners() {},
+  disconnect() {},
+});
 
 export default class SocketAPI {
   constructor(cardData, socket = io()) {
@@ -9,7 +16,9 @@ export default class SocketAPI {
     // this.socket = io(url);
     this.socket = socket;
 
-    this.socket.on('card-clicked', word => console.log('someone clicked', word));
+    this.socket.on('card-clicked', word =>
+      console.log('someone clicked', word)
+    );
     this.onCardClicked = this.socket.on.bind(this.socket, 'card-clicked');
     this.cardData = cardData;
   }
