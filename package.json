@@ -36,7 +36,8 @@
     "terser-webpack-plugin": "^1.2.2",
     "wait-for-expect": "^1.2.0",
     "webpack": "^4.29.4",
-    "webpack-cli": "^3.3.11"
+    "webpack-cli": "^3.3.11",
+    "webpack-simple": "^1.7.8"
   },
   "husky": {
     "hooks": {
@@ -54,10 +55,12 @@
   "dependencies": {
     "chalk": "^4",
     "express": "^4.16.4",
+    "firebase": "^9.6.1",
     "ip": "^1.1.5",
     "prop-types": "^15.6.2",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
-    "socket.io": "^2.4.1"
+    "socket.io": "^2.4.1",
+    "swr": "^1.1.2"
   }
 }

@@ -52,9 +52,12 @@ const makeCards = (length = LENGTH) => {
   const composed = compose(
     withColors,
     withWords
-  )({ cards: Array(length).fill({}) });
+  )({ cards: Array(length).fill({ hidden: true }) });
 
-  return composed.cards;
+  return composed.cards.reduce((acc, curr) => {
+    acc[curr.word] = curr;
+    return acc;
+  }, {});
 };
 
 module.exports = {
