@@ -5,7 +5,7 @@ import App from '../App';
 import Fallback from '../components/Fallback';
 import Card from '../components/Card';
 import { colors, makeCards } from '../cardData';
-import { makeApi } from '../db';
+import { makeApi } from '../api';
 
 jest.mock('firebase/firestore');
 jest.mock('../firebase');
@@ -35,8 +35,9 @@ describe('App', () => {
 
     it('displays "Error" if error while fetching', () => {
       const mockApi = {
+        init() {},
         close() {},
-        getCards: () => Promise.reject(new Error('No!')),
+        onCardUpdates: fn => fn(new Error('No!')),
         clickCard: () => {},
       };
       const { container, queryByTestId } = render(<App api={mockApi} />);
@@ -79,8 +80,9 @@ describe('App', () => {
 
     it('api.close is called on unmount', () => {
       const mockApi = {
+        init: jest.fn(),
         close: jest.fn(),
-        getCards: jest.fn(() => Promise.resolve()),
+        onCardUpdates: fn => fn(null, []),
         clickCard: () => {},
       };
       const { unmount } = render(<App api={mockApi} />);
@@ -93,6 +95,7 @@ describe('App', () => {
     });
 
     // TODO: Check that click updates other players if multiple devices
+    it.todo('clicking New Game button initializes a new game');
   });
 
   describe('spymaster', () => {

@@ -4,7 +4,7 @@ import Grid from './components/Grid';
 import Card from './components/Card';
 import Fallback from './components/Fallback';
 import { colors } from './cardData';
-import { makeApi } from './db';
+import { makeApi } from './api';
 
 const isFreakmaster =
   window && window.location.pathname.includes('freakmaster');
@@ -18,8 +18,6 @@ function App({ api, isSpymaster = isFreakmaster }) {
     isSpymaster || !hidden ? color : colors.DEFAULT;
 
   const getAnimation = ({ hidden }) => isSpymaster || !hidden;
-  // const hideCard = card => ({ ...card, hidden: true });
-
   const toggleHidden = ({ word }) => {
     setCards(c =>
       c.map(card => {
@@ -33,26 +31,19 @@ function App({ api, isSpymaster = isFreakmaster }) {
 
   useLayoutEffect(() => {
     setLoading(true);
-    api
-      // TODO: "Start game" button
-      // .init()
-      .getCards()
-      .then(fetchedCards => {
-        // TODO: onSnapshotUpdate
-        setLoading(false);
-        console.log(`fetchedCards:`, fetchedCards);
-        setCards(Object.values(fetchedCards));
-      })
-      .catch(err => {
-        setLoading(false);
+    api.onCardUpdates((err, newCards) => {
+      setLoading(false);
+      if (err) {
         setError(err);
-      });
+        return;
+      }
+      setCards(newCards);
+    });
 
     return () => api.close();
   }, [api]);
 
   const handleClick = card => {
-    console.log(`card:`, card);
     const hidden = !card.hidden;
     toggleHidden(card);
     api.clickCard({ ...card, hidden });
@@ -61,30 +52,38 @@ function App({ api, isSpymaster = isFreakmaster }) {
   return loading || error || !cards.length ? (
     <Fallback loading={loading} error={error} cards={cards} />
   ) : (
-    <Grid>
-      {cards.map(({ word, color, hidden }) => (
-        <Card
-          key={word}
-          word={word}
-          color={getColor({ color, hidden })}
-          animation={getAnimation({ hidden })}
-          onClick={() => handleClick({ word, color, hidden })}
-        />
-      ))}
-    </Grid>
+    <>
+      <Grid>
+        {cards.map(({ word, color, hidden }) => (
+          <Card
+            key={word}
+            word={word}
+            color={getColor({ color, hidden })}
+            animation={getAnimation({ hidden })}
+            onClick={() => handleClick({ word, color, hidden })}
+          />
+        ))}
+      </Grid>
+      <button type="button" onClick={api.init}>
+        New game
+      </button>
+    </>
   );
 }
 
 App.propTypes = {
   api: PropTypes.shape({
+    init: PropTypes.func.isRequired,
     close: PropTypes.func.isRequired,
-    getCards: PropTypes.func.isRequired,
     clickCard: PropTypes.func.isRequired,
+    onCardUpdates: PropTypes.func.isRequired,
   }),
+  isSpymaster: PropTypes.bool,
 };
 
 App.defaultProps = {
   api: makeApi(),
+  isSpymaster: false,
 };
 
 export default App;

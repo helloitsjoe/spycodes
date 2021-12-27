@@ -16,9 +16,21 @@ const LENGTH = 25;
 const shuffle = array => {
   for (let i = array.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
+    // eslint-disable-next-line no-param-reassign
     [array[i], array[j]] = [array[j], array[i]];
   }
   return array;
+};
+
+const toArray = data => {
+  return Object.values(data).sort((a, b) => (a.word > b.word ? 1 : -1));
+};
+
+const toObject = data => {
+  return data.reduce((acc, curr) => {
+    acc[curr.word] = curr;
+    return acc;
+  }, {});
 };
 
 const withColors = ({ cards, chance = Math.random() }) => {
@@ -44,7 +56,7 @@ const withColors = ({ cards, chance = Math.random() }) => {
 
 const withWords = ({ cards }) => {
   const words = shuffle([...official]);
-  const worded = cards.map((box, i) => ({ ...box, word: words.pop() }));
+  const worded = cards.map(box => ({ ...box, word: words.pop() }));
   return { cards: shuffle(worded) };
 };
 
@@ -54,14 +66,13 @@ const makeCards = (length = LENGTH) => {
     withWords
   )({ cards: Array(length).fill({ hidden: true }) });
 
-  return composed.cards.reduce((acc, curr) => {
-    acc[curr.word] = curr;
-    return acc;
-  }, {});
+  return toObject(composed.cards);
 };
 
 module.exports = {
   colors,
+  toArray,
+  toObject,
   withWords,
   withColors,
   makeCards,
