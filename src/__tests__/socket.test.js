@@ -1,5 +1,6 @@
 import Socket from '../socket';
 
+// TODO: Convert this to db tests
 describe('Socket', () => {
   const cardData = [{ color: 'blue', word: 'yes' }];
   const mockSocket = {
@@ -47,7 +48,7 @@ describe('Socket', () => {
       expect(mockSocket.on.mock.calls[1]).toContain('card-data');
     });
 
-    it('sets card data on socket', async done => {
+    it('sets card data on socket', done => {
       const socket = new Socket(null, mockSocket);
       socket.getCards().then(cards => {
         expect(cards).toEqual(cardData);

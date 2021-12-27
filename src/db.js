@@ -3,8 +3,10 @@ import { getFirestore, onSnapshot, setDoc, doc } from 'firebase/firestore';
 import firebaseApp from './firebase';
 import { makeCards } from './cardData';
 
-export const makeApi = (cards = makeCards(), app = firebaseApp) => {
-  const db = getFirestore(app);
+export const makeApi = (
+  cards = makeCards(),
+  db = getFirestore(firebaseApp)
+) => {
   let unsub = () => {};
 
   const init = () => {

@@ -1,22 +1,23 @@
 /* eslint-disable indent */
 import React from 'react';
-import { render, cleanup, fireEvent, wait } from '@testing-library/react';
+import { render, fireEvent, waitFor } from '@testing-library/react';
 import App from '../App';
 import Fallback from '../components/Fallback';
 import Card from '../components/Card';
 import { colors, makeCards } from '../cardData';
 import { makeApi } from '../db';
 
-const { RED, BLUE, DEFAULT, BLACK, YELLOW } = colors;
+jest.mock('firebase/firestore');
+jest.mock('../firebase');
 
-afterEach(cleanup);
+const { RED, BLUE, DEFAULT, BLACK, YELLOW } = colors;
 
 describe('App', () => {
   describe('player', () => {
     it('loads cards', () => {
       const singleCard = [{ color: RED, hidden: true, word: 'poo' }];
       const { container, findByTestId } = render(
-        <App api={makeApi(singleCard)} />
+        <App api={makeApi(singleCard, null)} />
       );
       expect(container.textContent).toBe('Loading...');
       return findByTestId('card').then(card => {
@@ -26,7 +27,7 @@ describe('App', () => {
 
     it('displays "No cards!" if no cards are fetched', () => {
       const { container, queryByTestId } = render(<App api={makeApi([])} />);
-      return wait(() => {
+      return waitFor(() => {
         expect(container.textContent).toBe('No cards!');
         expect(queryByTestId('card')).toBe(null);
       });
@@ -38,7 +39,7 @@ describe('App', () => {
         getCards: () => Promise.reject(new Error('No!')),
       };
       const { container, queryByTestId } = render(<App api={mockApi} />);
-      return wait(() => {
+      return waitFor(() => {
         expect(container.textContent).toBe('Error! No!');
         expect(queryByTestId('card')).toBe(null);
       });

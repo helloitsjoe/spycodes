@@ -4,7 +4,7 @@ const socketIO = require('socket.io');
 const path = require('path');
 const http = require('http');
 const ip = require('ip');
-const { makeCards } = require('./cardData');
+const { makeCards } = require('../src/cardData');
 
 const makeServer = (host = 'localhost', port = 3000) => {
   const app = express();
