@@ -7,7 +7,7 @@ const Grid = ({ children }) => (
       display: 'flex',
       justifyContent: 'center',
       alignItems: 'center',
-      marginTop: '2em',
+      margin: '2em',
     }}
   >
     <div

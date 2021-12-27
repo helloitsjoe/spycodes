@@ -6,10 +6,10 @@ import Fallback from './components/Fallback';
 import { colors } from './cardData';
 import { makeApi } from './api';
 
-const isFreakmaster =
+const getIsFreakmaster = () =>
   window && window.location.pathname.includes('freakmaster');
 
-function App({ api, isSpymaster = isFreakmaster }) {
+function App({ api, isSpymaster }) {
   const [cards, setCards] = useState([]);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -64,9 +64,11 @@ function App({ api, isSpymaster = isFreakmaster }) {
           />
         ))}
       </Grid>
-      <button type="button" onClick={api.init}>
-        New game
-      </button>
+      <div style={{ textAlign: 'center' }}>
+        <button type="button" onClick={api.init}>
+          New game
+        </button>
+      </div>
     </>
   );
 }
@@ -83,7 +85,7 @@ App.propTypes = {
 
 App.defaultProps = {
   api: makeApi(),
-  isSpymaster: false,
+  isSpymaster: getIsFreakmaster(),
 };
 
 export default App;
