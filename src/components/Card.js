@@ -3,13 +3,13 @@ import PropTypes from 'prop-types';
 import { colors } from '../cardData';
 
 function Card({ color, word, isSpymaster, hidden, onClick }) {
-  const border = isSpymaster && !hidden ? 'seen' : '';
+  const border = isSpymaster && !hidden ? `seen text-${color}` : '';
   const bg = isSpymaster || !hidden ? color : colors.DEFAULT;
   const animation = isSpymaster || !hidden;
 
   return (
-    // eslint-disable-next-line
     <button
+      type="button"
       data-testid="card"
       className={['card', animation ? 'front' : 'back', bg, border]
         .filter(Boolean)

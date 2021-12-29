@@ -72,7 +72,7 @@ function App({ api, isSpymaster }) {
     <>
       {dead && <div className="winner">DEAD</div>}
       {(!redRemaining || !blueRemaining) && !dead && (
-        <div className={`winner ${redRemaining ? 'blue' : 'red'}-text`}>
+        <div className={`winner text-${redRemaining ? 'blue' : 'red'}`}>
           {redRemaining ? 'Blue' : 'Red'} Wins!
         </div>
       )}
