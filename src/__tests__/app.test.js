@@ -1,6 +1,6 @@
 /* eslint-disable indent */
 import React from 'react';
-import { render, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import App from '../App';
 import Fallback from '../components/Fallback';
 import Card from '../components/Card';
@@ -94,12 +94,27 @@ describe('App', () => {
       });
     });
 
-    // TODO: Check that click updates other players if multiple devices
-    it.todo('clicking New Game button initializes a new game');
-    it.todo('shows remaining red and blue');
+    it('shows remaining red and blue', () => {
+      const mockCards = [
+        { color: RED, hidden: true, word: 'poo' },
+        { color: BLUE, hidden: true, word: 'bloo' },
+        { color: BLUE, hidden: true, word: 'froo' },
+      ];
+      render(<App api={makeApi(mockCards)} />);
+      return waitFor(() => {
+        expect(screen.queryByText(/loading/i)).toBe(null);
+      }).then(() => {
+        expect(screen.getByText(/1 left/).className).toMatch('red');
+        expect(screen.getByText(/2 left/).className).toMatch('blue');
+      });
+    });
+
     it.todo('shows red wins message if no remaining red');
     it.todo('shows blue wins message if no remaining blue');
     it.todo('shows dead message if black card is revealed');
+
+    // TODO: Check that click updates other players if multiple devices
+    it.todo('clicking New Game button initializes a new game');
   });
 
   describe('spymaster', () => {
