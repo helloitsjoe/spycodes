@@ -151,8 +151,8 @@ describe('Card', () => {
     expect(onClick).toBeCalledTimes(1);
   });
 
-  it('renders color from prop', () => {
-    const { getByTestId } = render(<Card color={RED} />);
+  it('renders color from prop if not hidden', () => {
+    const { getByTestId } = render(<Card color={RED} hidden={false} />);
     expect(getByTestId('card').className).toMatch(RED);
     expect(getByTestId('card').textContent).toBe('');
   });

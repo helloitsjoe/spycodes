@@ -32,11 +32,6 @@ function App({ api, isSpymaster }) {
 
   const { redRemaining, blueRemaining } = getRemaining(cards);
 
-  const getBorder = ({ hidden }) => (isSpymaster && !hidden ? 'seen' : '');
-  const getColor = ({ hidden, color }) =>
-    isSpymaster || !hidden ? color : colors.DEFAULT;
-
-  const getAnimation = ({ hidden }) => isSpymaster || !hidden;
   const toggleHidden = ({ word }) => {
     setCards(c =>
       c.map(card => {
@@ -82,9 +77,12 @@ function App({ api, isSpymaster }) {
           <Card
             key={word}
             word={word}
-            color={getColor({ color, hidden })}
-            border={getBorder({ hidden })}
-            animation={getAnimation({ hidden })}
+            color={color}
+            hidden={hidden}
+            isSpymaster={isSpymaster}
+            // color={getColor({ color, hidden })}
+            // border={getBorder({ hidden })}
+            // animation={getAnimation({ hidden })}
             onClick={() => handleClick({ word, color, hidden })}
           />
         ))}

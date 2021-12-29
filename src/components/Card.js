@@ -2,13 +2,16 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { colors } from '../cardData';
 
-function Card({ color, word, border, animation, onClick }) {
+function Card({ color, word, isSpymaster, hidden, onClick }) {
+  const border = isSpymaster && !hidden ? 'seen' : '';
+  const bg = isSpymaster || !hidden ? color : colors.DEFAULT;
+  const animation = isSpymaster || !hidden;
+
   return (
     // eslint-disable-next-line
     <button
-      // className={[card.card, animation && card.flip, card[color]].join(' ')}
       data-testid="card"
-      className={['card', animation ? 'front' : 'back', color, border]
+      className={['card', animation ? 'front' : 'back', bg, border]
         .filter(Boolean)
         .join(' ')}
       onClick={onClick}
@@ -20,17 +23,17 @@ function Card({ color, word, border, animation, onClick }) {
 
 Card.propTypes = {
   color: PropTypes.string,
-  border: PropTypes.string,
+  isSpymaster: PropTypes.bool,
   word: PropTypes.string,
   onClick: PropTypes.func,
-  animation: PropTypes.bool,
+  hidden: PropTypes.bool,
 };
 
 Card.defaultProps = {
   color: colors.DEFAULT,
+  isSpymaster: false,
   onClick: null,
-  animation: false,
-  border: '',
+  hidden: true,
   word: '',
 };
 
