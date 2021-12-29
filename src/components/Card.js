@@ -5,14 +5,14 @@ import { colors } from '../cardData';
 function Card({ color, word, animation, onClick }) {
   return (
     // eslint-disable-next-line
-    <div
+    <button
       // className={[card.card, animation && card.flip, card[color]].join(' ')}
       data-testid="card"
       className={['card', animation ? 'front' : 'back', color].join(' ')}
       onClick={onClick}
     >
       {word && word.toUpperCase()}
-    </div>
+    </button>
   );
 }
 

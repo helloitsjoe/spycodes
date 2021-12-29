@@ -52,6 +52,7 @@ function App({ api, isSpymaster }) {
   return loading || error || !cards.length ? (
     <Fallback loading={loading} error={error} cards={cards} />
   ) : (
+    // <div className="grid-container">
     <>
       <Grid>
         {cards.map(({ word, color, hidden }) => (
@@ -65,10 +66,11 @@ function App({ api, isSpymaster }) {
         ))}
       </Grid>
       <div style={{ textAlign: 'center' }}>
-        <button type="button" onClick={api.init}>
+        <button className="btn" type="button" onClick={api.init}>
           New game
         </button>
       </div>
+      {/* </div> */}
     </>
   );
 }

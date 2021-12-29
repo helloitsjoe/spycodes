@@ -5,7 +5,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link href="https://fonts.googleapis.com/css?family=Roboto+Slab:400,700" rel="stylesheet">
-  <link rel="stylesheet" href="./public/styles.css"/>
+  <!-- <link rel="stylesheet" href="./public/styles.css"/> -->
   <title>Document</title>
   <style>
     * {
@@ -18,7 +18,7 @@
       list-style-type: none;
     }
 
-    button {
+    .btn {
       font-family: 'Roboto Slab';
       font-weight: 700;
       border: 2px solid gray;
@@ -27,21 +27,23 @@
       padding: 1em;
     }
 
-    button:hover {
+    .btn:hover {
       border: 2px solid black;
       color: black;
     }
 
     .grid-container {
+      display: flex;
+      flex-direction: column;
       margin: auto;
+      height: 100vh;
       max-width: 64em;
     }
 
     .grid {
       display: flex;
+      flex-grow: 1;
       flex-wrap: wrap;
-      justify-content: space-around;
-      align-items: center;
       margin: 1em;
     }
 
@@ -50,18 +52,16 @@
       font-weight: 700;
       font-size: 1rem;
       color: #fff;
+      border: none;
       border-radius: 3px;
       box-shadow: 0px 5px 20px -10px 0.5 rgb(0, 0, 0, 0.5);
       display: flex;
       flex-direction: column;
       justify-content: center;
       align-items: center;
+      min-height: 80px;
       margin: 0.5em;
-      flex-grow: 1;
-      /* min-width: 120px; */
       width: 100%;
-      height: 80px;
-      line-height: 80px;
     }
 
     .back {
@@ -72,8 +72,6 @@
 
     .front {
       transition: all 0.3s;
-      /* transform: translateY(0px) rotate3d(0, 1, 0, 180deg); */
-      /* color: rgba(255, 255, 255, 0); */
     }
 
     .red {
@@ -100,32 +98,15 @@
       background-color: #888;
     }
 
-    /* .flip {
-      animation: flip 0.3s;
-    } */
-
-    /* @keyframes flip {
-      0% {
-        transform: translateY(0px) rotate3d(0, 0, 0, 0deg);
-        animation-timing-function: cubic-bezier();
-      }
-      50% {
-        transform: translateY(-10px) rotate3d(0, 0.5, 0, 90deg);
-        box-shadow: 0px 5px 20px 0px rgb(0, 0, 0, 0.5);
-        animation-timing-function: cubic-bezier();
-      }
-      100% {
-        transform: translateY(0px) rotate3d(0, 1, 0, 180deg);
-        animation-timing-function: cubic-bezier();
-      }
-    } */
-
+    /* Medium */
     @media screen and (min-width: 540px) {
       .card {
         width: calc(100% * 1/3 - 1em);
+        min-height: 0;
       }
     }
 
+    /* Desktop */
     @media screen and (min-width: 720px) {
       .card {
         width: calc(100% * 1/5 - 1em);
