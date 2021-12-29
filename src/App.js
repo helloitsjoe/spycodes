@@ -31,6 +31,9 @@ function App({ api, isSpymaster }) {
   const [loading, setLoading] = useState(false);
 
   const { redRemaining, blueRemaining } = getRemaining(cards);
+  const dead = cards.find(
+    ({ color, hidden }) => color === colors.BLACK && !hidden
+  );
 
   const toggleHidden = ({ word }) => {
     setCards(c =>
@@ -67,7 +70,8 @@ function App({ api, isSpymaster }) {
     <Fallback loading={loading} error={error} cards={cards} />
   ) : (
     <>
-      {(!redRemaining || !blueRemaining) && (
+      {dead && <div className="winner">DEAD</div>}
+      {(!redRemaining || !blueRemaining) && !dead && (
         <div className={`winner ${redRemaining ? 'blue' : 'red'}-text`}>
           {redRemaining ? 'Blue' : 'Red'} Wins!
         </div>
