@@ -8,7 +8,7 @@ const colors = {
   BLACK: 'black',
   WHITE: 'white',
   YELLOW: 'yellow',
-  DEFAULT: 'default',
+  DEFAULT: 'gray',
 };
 
 const LENGTH = 25;

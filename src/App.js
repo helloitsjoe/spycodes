@@ -72,7 +72,10 @@ function App({ api, isSpymaster }) {
     <>
       {dead && <div className="winner">DEAD</div>}
       {(!redRemaining || !blueRemaining) && !dead && (
-        <div className={`winner text-${redRemaining ? 'blue' : 'red'}`}>
+        <div
+          data-color={redRemaining ? colors.BLUE : colors.RED}
+          className="winner"
+        >
           {redRemaining ? 'Blue' : 'Red'} Wins!
         </div>
       )}
@@ -84,9 +87,6 @@ function App({ api, isSpymaster }) {
             color={color}
             hidden={hidden}
             isSpymaster={isSpymaster}
-            // color={getColor({ color, hidden })}
-            // border={getBorder({ hidden })}
-            // animation={getAnimation({ hidden })}
             onClick={() => handleClick({ word, color, hidden })}
           />
         ))}
@@ -99,11 +99,15 @@ function App({ api, isSpymaster }) {
           margin: '1em',
         }}
       >
-        <span className={`chip ${colors.RED}`}>{redRemaining} left</span>
+        <span data-color={colors.RED} className="chip">
+          {redRemaining} left
+        </span>
         <button className="btn" type="button" onClick={api.init}>
           New game
         </button>
-        <span className={`chip ${colors.BLUE}`}>{blueRemaining} left</span>
+        <span data-color={colors.BLUE} className="chip">
+          {blueRemaining} left
+        </span>
       </div>
     </>
   );

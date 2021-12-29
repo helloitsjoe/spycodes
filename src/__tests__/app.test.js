@@ -58,9 +58,11 @@ describe('App', () => {
       const singleCard = [{ color: RED, hidden: true, word: 'poo' }];
       const { findByText } = render(<App api={makeApi(singleCard)} />);
       return findByText('POO').then(card => {
-        expect(card.className).toBe('card back default');
+        expect(card.className).toBe('card back');
+        expect(card.dataset.color).toBe(DEFAULT);
         fireEvent.click(card);
-        expect(card.className).toBe('card front red');
+        expect(card.className).toBe('card front');
+        expect(card.dataset.color).toBe(RED);
         expect(card.textContent).toBe('POO');
       });
     });
@@ -104,8 +106,8 @@ describe('App', () => {
       return waitFor(() => {
         expect(screen.queryByText(/loading/i)).toBe(null);
       }).then(() => {
-        expect(screen.getByText(/1 left/).className).toMatch('red');
-        expect(screen.getByText(/2 left/).className).toMatch('blue');
+        expect(screen.getByText(/1 left/).dataset.color).toBe(RED);
+        expect(screen.getByText(/2 left/).dataset.color).toBe(BLUE);
       });
     });
 
@@ -123,7 +125,7 @@ describe('App', () => {
         <App api={makeApi(makeCards())} isSpymaster />
       );
       return findAllByTestId('card').then(cards => {
-        const matchesColor = color => card => card.className.match(color);
+        const matchesColor = color => card => card.dataset.color === color;
         expect(cards.some(matchesColor(RED))).toBe(true);
         expect(cards.some(matchesColor(BLUE))).toBe(true);
         expect(cards.some(matchesColor(YELLOW))).toBe(true);
@@ -170,16 +172,21 @@ describe('Card', () => {
     expect(onClick).toBeCalledTimes(1);
   });
 
+  it('renders default color if hidden', () => {
+    const { getByTestId } = render(<Card color={RED} hidden />);
+    expect(getByTestId('card').dataset.color).toBe(colors.DEFAULT);
+    expect(getByTestId('card').textContent).toBe('');
+  });
+
   it('renders color from prop if not hidden', () => {
     const { getByTestId } = render(<Card color={RED} hidden={false} />);
-    expect(getByTestId('card').className).toMatch(RED);
+    expect(getByTestId('card').dataset.color).toBe(colors.RED);
     expect(getByTestId('card').textContent).toBe('');
   });
 
   it.todo('renders color for spymaster even if hidden');
   it.todo('renders border for spymaster if not hidden');
   it.todo('does not render border for non-spymaster if not hidden');
-  it.todo('renders default color if hidden');
 
   it('renders uppercase word from prop', () => {
     const { getByTestId } = render(<Card word="poo" />);
