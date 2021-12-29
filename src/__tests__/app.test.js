@@ -96,6 +96,10 @@ describe('App', () => {
 
     // TODO: Check that click updates other players if multiple devices
     it.todo('clicking New Game button initializes a new game');
+    it.todo('shows remaining red and blue');
+    it.todo('shows red wins message if no remaining red');
+    it.todo('shows blue wins message if no remaining blue');
+    it.todo('shows dead message if black card is revealed');
   });
 
   describe('spymaster', () => {
@@ -156,6 +160,11 @@ describe('Card', () => {
     expect(getByTestId('card').className).toMatch(RED);
     expect(getByTestId('card').textContent).toBe('');
   });
+
+  it.todo('renders color for spymaster even if hidden');
+  it.todo('renders border for spymaster if not hidden');
+  it.todo('does not render border for non-spymaster if not hidden');
+  it.todo('renders default color if hidden');
 
   it('renders uppercase word from prop', () => {
     const { getByTestId } = render(<Card word="poo" />);
