@@ -1,4 +1,4 @@
-const { official } = require('../resources/words.json');
+const { many } = require('../resources/words.json');
 
 const compose = (...args) => data => args.reduce((acc, fn) => fn(acc), data);
 
@@ -55,7 +55,7 @@ const withColors = ({ cards, chance = Math.random() }) => {
 };
 
 const withWords = ({ cards }) => {
-  const words = shuffle([...official]);
+  const words = shuffle([...many]);
   const worded = cards.map(box => ({ ...box, word: words.pop() }));
   return { cards: shuffle(worded) };
 };
