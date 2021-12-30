@@ -1,6 +1,12 @@
 /* eslint-disable indent */
 import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import {
+  render,
+  screen,
+  fireEvent,
+  waitFor,
+  waitForElementToBeRemoved,
+} from '@testing-library/react';
 import App from '../App';
 import Fallback from '../components/Fallback';
 import Card from '../components/Card';
@@ -111,9 +117,59 @@ describe('App', () => {
       });
     });
 
-    it.todo('shows red wins message if no remaining red');
-    it.todo('shows blue wins message if no remaining blue');
-    it.todo('shows dead message if black card is revealed');
+    it('shows red wins message if no remaining red', () => {
+      const mockCards = [
+        { color: RED, hidden: true, word: 'poo' },
+        { color: BLUE, hidden: true, word: 'bloo' },
+        { color: BLUE, hidden: true, word: 'froo' },
+      ];
+      render(<App api={makeApi(mockCards)} />);
+      return waitForElementToBeRemoved(() =>
+        screen.queryByText(/loading/i)
+      ).then(() => {
+        expect(screen.queryByText(/red wins/i)).toBe(null);
+        expect(screen.queryByText(/blue wins/i)).toBe(null);
+        fireEvent.click(screen.getByText(/poo/i));
+        expect(screen.queryByText(/red wins/i)).toBeTruthy();
+        expect(screen.queryByText(/blue wins/i)).toBe(null);
+      });
+    });
+
+    it('shows blue wins message if no remaining blue', () => {
+      const mockCards = [
+        { color: BLUE, hidden: true, word: 'poo' },
+        { color: RED, hidden: true, word: 'bloo' },
+        { color: RED, hidden: true, word: 'froo' },
+      ];
+      render(<App api={makeApi(mockCards)} />);
+      return waitForElementToBeRemoved(() =>
+        screen.queryByText(/loading/i)
+      ).then(() => {
+        expect(screen.queryByText(/red wins/i)).toBe(null);
+        expect(screen.queryByText(/blue wins/i)).toBe(null);
+        fireEvent.click(screen.getByText(/poo/i));
+        expect(screen.queryByText(/red wins/i)).toBe(null);
+        expect(screen.queryByText(/blue wins/i)).toBeTruthy();
+      });
+    });
+
+    it('shows dead message if black card is revealed', () => {
+      const mockCards = [
+        { color: BLUE, hidden: true, word: 'poo' },
+        { color: RED, hidden: true, word: 'bloo' },
+        { color: BLACK, hidden: true, word: 'ded' },
+      ];
+      render(<App api={makeApi(mockCards)} />);
+      return waitForElementToBeRemoved(() =>
+        screen.queryByText(/loading/i)
+      ).then(() => {
+        expect(screen.queryByText(/dead/i)).toBe(null);
+        fireEvent.click(screen.getByText(/ded/i));
+        expect(screen.queryByText(/red wins/i)).toBe(null);
+        expect(screen.queryByText(/blue wins/i)).toBe(null);
+        expect(screen.queryByText(/dead/i)).toBeTruthy();
+      });
+    });
 
     // TODO: Check that click updates other players if multiple devices
     it.todo('clicking New Game button initializes a new game');
@@ -164,33 +220,49 @@ describe('Fallback', () => {
 });
 
 describe('Card', () => {
+  const baseProps = {
+    color: RED,
+    hidden: true,
+    isSpymaster: false,
+    word: 'apple',
+  };
+
   it('handles click', () => {
     const onClick = jest.fn();
-    const { getByTestId } = render(<Card onClick={onClick} />);
+    render(<Card onClick={onClick} />);
     expect(onClick).toBeCalledTimes(0);
-    fireEvent.click(getByTestId('card'));
+    fireEvent.click(screen.getByTestId('card'));
     expect(onClick).toBeCalledTimes(1);
   });
 
+  it('renders uppercase word from prop', () => {
+    render(<Card {...baseProps} />);
+    expect(screen.getByTestId('card').textContent).toMatch('APPLE');
+  });
+
   it('renders default color if hidden', () => {
-    const { getByTestId } = render(<Card color={RED} hidden />);
-    expect(getByTestId('card').dataset.color).toBe(colors.DEFAULT);
-    expect(getByTestId('card').textContent).toBe('');
+    render(<Card {...baseProps} />);
+    expect(screen.getByTestId('card').dataset.color).toBe(colors.DEFAULT);
   });
 
   it('renders color from prop if not hidden', () => {
-    const { getByTestId } = render(<Card color={RED} hidden={false} />);
-    expect(getByTestId('card').dataset.color).toBe(colors.RED);
-    expect(getByTestId('card').textContent).toBe('');
+    render(<Card {...baseProps} hidden={false} />);
+    expect(screen.getByTestId('card').dataset.color).toBe(colors.RED);
   });
 
-  it.todo('renders color for spymaster even if hidden');
-  it.todo('renders border for spymaster if not hidden');
-  it.todo('does not render border for non-spymaster if not hidden');
+  it('renders color for spymaster even if hidden', () => {
+    render(<Card {...baseProps} hidden isSpymaster />);
+    expect(screen.getByTestId('card').dataset.color).toBe(colors.RED);
+  });
 
-  it('renders uppercase word from prop', () => {
-    const { getByTestId } = render(<Card word="poo" />);
-    expect(getByTestId('card').textContent).toMatch('POO');
+  it('renders as "seen" for spymaster if not hidden', () => {
+    render(<Card {...baseProps} hidden={false} isSpymaster />);
+    expect(screen.getByTestId('card').className).toMatch('seen');
+  });
+
+  it('does not render as "seen" for spymaster if hidden', () => {
+    render(<Card {...baseProps} hidden isSpymaster />);
+    expect(screen.getByTestId('card').className).not.toMatch('seen');
   });
 
   // it('renders text full size at width >= 400px', () => {
