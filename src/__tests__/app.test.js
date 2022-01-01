@@ -172,7 +172,22 @@ describe('App', () => {
     });
 
     // TODO: Check that click updates other players if multiple devices
-    it.todo('clicking New Game button initializes a new game');
+
+    it('clicking New Game button initializes a new game', () => {
+      const singleCard = [{ color: RED, hidden: true, word: 'poo' }];
+      const mockApi = {
+        init: jest.fn(),
+        close() {},
+        onCardUpdates: fn => fn(null, singleCard),
+        clickCard: () => {},
+      };
+      render(<App api={mockApi} />);
+      expect(mockApi.init).not.toBeCalled();
+      return screen.findByRole('button', { name: /new game/i }, button => {
+        fireEvent.click(button);
+        expect(mockApi.init).toBeCalled();
+      });
+    });
   });
 
   describe('spymaster', () => {
