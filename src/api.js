@@ -3,7 +3,7 @@ import { getFirestore, onSnapshot, setDoc, doc } from 'firebase/firestore';
 import firebaseApp from './firebase';
 import { makeCards, toArray } from './cardData';
 
-export const makeApi = (cards, db = getFirestore(firebaseApp)) => {
+export const makeApi = (gameId, cards, db = getFirestore(firebaseApp)) => {
   let unsub = () => {};
 
   const init = () => {
@@ -13,7 +13,7 @@ export const makeApi = (cards, db = getFirestore(firebaseApp)) => {
     // TODO: Handle more than one game
     const cardsToSet = makeCards();
     console.log(`setting cards:`, cardsToSet);
-    return setDoc(doc(db, `cards/current`), cardsToSet);
+    return setDoc(doc(db, `cards/${gameId}`), cardsToSet);
   };
 
   const onCardUpdates = fn => {
@@ -27,7 +27,7 @@ export const makeApi = (cards, db = getFirestore(firebaseApp)) => {
     }
 
     unsub = onSnapshot(
-      doc(db, 'cards/current'),
+      doc(db, `cards/${gameId}`),
       newCards => {
         const ordered = toArray(newCards.data());
         console.log(`new cards:`, ordered);
@@ -45,7 +45,7 @@ export const makeApi = (cards, db = getFirestore(firebaseApp)) => {
   };
 
   const clickCard = card => {
-    setDoc(doc(db, `cards/current`), { [card.word]: card }, { merge: true });
+    setDoc(doc(db, `cards/${gameId}`), { [card.word]: card }, { merge: true });
   };
 
   return {

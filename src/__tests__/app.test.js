@@ -17,13 +17,14 @@ jest.mock('firebase/firestore');
 jest.mock('../firebase');
 
 const { RED, BLUE, DEFAULT, BLACK, YELLOW } = colors;
+const GAME_ID = 'ABCD';
 
 describe('App', () => {
   describe('player', () => {
     it('loads cards', () => {
       const singleCard = [{ color: RED, hidden: true, word: 'poo' }];
       const { container, findByTestId } = render(
-        <App api={makeApi(singleCard, null)} />
+        <App api={makeApi(GAME_ID, singleCard, null)} />
       );
       expect(container.textContent).toBe('Loading...');
       return findByTestId('card').then(card => {
@@ -32,7 +33,9 @@ describe('App', () => {
     });
 
     it('displays "No cards!" if no cards are fetched', () => {
-      const { container, queryByTestId } = render(<App api={makeApi([])} />);
+      const { container, queryByTestId } = render(
+        <App api={makeApi(GAME_ID, [])} />
+      );
       return waitFor(() => {
         expect(container.textContent).toBe('No cards!');
         expect(queryByTestId('card')).toBe(null);
@@ -54,7 +57,9 @@ describe('App', () => {
     });
 
     it('all cards have default colors', () => {
-      const { findAllByTestId } = render(<App api={makeApi(makeCards())} />);
+      const { findAllByTestId } = render(
+        <App api={makeApi(GAME_ID, makeCards())} />
+      );
       return findAllByTestId('card').then(cards => {
         expect(cards.every(card => card.className.match('back default')));
       });
@@ -62,7 +67,7 @@ describe('App', () => {
 
     it('click reveals card color', () => {
       const singleCard = [{ color: RED, hidden: true, word: 'poo' }];
-      const { findByText } = render(<App api={makeApi(singleCard)} />);
+      const { findByText } = render(<App api={makeApi(GAME_ID, singleCard)} />);
       return findByText('POO').then(card => {
         expect(card.className).toBe('card back');
         expect(card.dataset.color).toBe(DEFAULT);
@@ -78,7 +83,9 @@ describe('App', () => {
         { color: RED, hidden: true, word: 'poo' },
         { color: BLUE, hidden: true, word: 'bloo' },
       ];
-      const { findAllByTestId } = render(<App api={makeApi(mockCards)} />);
+      const { findAllByTestId } = render(
+        <App api={makeApi(GAME_ID, mockCards)} />
+      );
       return findAllByTestId('card').then(cards => {
         fireEvent.click(cards[0]);
         expect(cards[0].className).toMatch('front');
@@ -108,7 +115,7 @@ describe('App', () => {
         { color: BLUE, hidden: true, word: 'bloo' },
         { color: BLUE, hidden: true, word: 'froo' },
       ];
-      render(<App api={makeApi(mockCards)} />);
+      render(<App api={makeApi(GAME_ID, mockCards)} />);
       return waitFor(() => {
         expect(screen.queryByText(/loading/i)).toBe(null);
       }).then(() => {
@@ -123,7 +130,7 @@ describe('App', () => {
         { color: BLUE, hidden: true, word: 'bloo' },
         { color: BLUE, hidden: true, word: 'froo' },
       ];
-      render(<App api={makeApi(mockCards)} />);
+      render(<App api={makeApi(GAME_ID, mockCards)} />);
       return waitForElementToBeRemoved(() =>
         screen.queryByText(/loading/i)
       ).then(() => {
@@ -141,7 +148,7 @@ describe('App', () => {
         { color: RED, hidden: true, word: 'bloo' },
         { color: RED, hidden: true, word: 'froo' },
       ];
-      render(<App api={makeApi(mockCards)} />);
+      render(<App api={makeApi(GAME_ID, mockCards)} />);
       return waitForElementToBeRemoved(() =>
         screen.queryByText(/loading/i)
       ).then(() => {
@@ -159,7 +166,7 @@ describe('App', () => {
         { color: RED, hidden: true, word: 'bloo' },
         { color: BLACK, hidden: true, word: 'ded' },
       ];
-      render(<App api={makeApi(mockCards)} />);
+      render(<App api={makeApi(GAME_ID, mockCards)} />);
       return waitForElementToBeRemoved(() =>
         screen.queryByText(/loading/i)
       ).then(() => {
@@ -193,7 +200,7 @@ describe('App', () => {
   describe('spymaster', () => {
     it('cards have colors', () => {
       const { findAllByTestId } = render(
-        <App api={makeApi(makeCards())} isSpymaster />
+        <App api={makeApi(GAME_ID, makeCards())} isSpymaster />
       );
       return findAllByTestId('card').then(cards => {
         const matchesColor = color => card => card.dataset.color === color;
@@ -207,7 +214,7 @@ describe('App', () => {
 
     it('clicking card does NOT hide it', () => {
       const { findAllByTestId } = render(
-        <App api={makeApi(makeCards())} isSpymaster />
+        <App api={makeApi(GAME_ID, makeCards())} isSpymaster />
       );
       return findAllByTestId('card').then(([firstCard]) => {
         expect(firstCard.className).not.toMatch(DEFAULT);
