@@ -43,6 +43,14 @@ describe('makeApi', () => {
     });
   });
 
+  // it('if no game ID in API, init creates new game ID and sets in DB', () => {
+  //   const api = makeApi();
+  //   api.init();
+  //   expect(getDoc).toBeCalledWith('some-doc', expect.any(Object));
+  //   expect(setDoc).toBeCalledWith('some-doc', expect.any(Object));
+  //   expect(doc).toBeCalledWith(undefined, 'cards/ABCD');
+  // });
+
   it('clickCard sets card info on current game', () => {
     const singleCard = { color: colors.RED, hidden: true, word: 'poo' };
     const api = makeApi(GAME_ID, [singleCard]);

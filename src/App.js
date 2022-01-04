@@ -1,131 +1,43 @@
-import React, { useState, useLayoutEffect } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
-import Grid from './components/Grid';
-import Card from './components/Card';
-import Fallback from './components/Fallback';
-import { colors } from './cardData';
 import { makeApi } from './api';
+import Game from './components/Game';
+import GameForm from './components/GameForm';
 
 const getIsFreakmaster = () =>
   window && window.location.pathname.includes('freakmaster');
 
-const getRemaining = cards =>
-  cards.reduce(
-    (acc, { color, hidden }) => {
-      if (!hidden) {
-        return acc;
-      }
-      if (color === colors.RED) {
-        acc.redRemaining++;
-      } else if (color === colors.BLUE) {
-        acc.blueRemaining++;
-      }
-      return acc;
-    },
-    { redRemaining: 0, blueRemaining: 0 }
-  );
+const getGameId = () => {
+  console.log(`window.location.query:`, window.location.search);
+  const params = new URLSearchParams(window.location.search);
+  const game = params.get('game');
+  console.log(`params, game:`, params, game);
+  return game;
+};
 
-function App({ api, isSpymaster }) {
-  const [cards, setCards] = useState([]);
-  const [error, setError] = useState(null);
-  const [loading, setLoading] = useState(false);
+function App({ gameId }) {
+  const api = makeApi(gameId);
 
-  const { redRemaining, blueRemaining } = getRemaining(cards);
-  const dead = cards.find(
-    ({ color, hidden }) => color === colors.BLACK && !hidden
-  );
+  // TODO: Check game ID async
+  // React.useEffect(() => {
+  //   if (!api.gameExists(gameId)) {
 
-  const toggleHidden = ({ word }) => {
-    setCards(c =>
-      c.map(card => {
-        if (card.word === word) {
-          return { ...card, hidden: !card.hidden };
-        }
-        return card;
-      })
-    );
-  };
+  //   }
+  // })
 
-  useLayoutEffect(() => {
-    setLoading(true);
-    api.onCardUpdates((err, newCards) => {
-      setLoading(false);
-      if (err) {
-        setError(err);
-        return;
-      }
-      setCards(newCards);
-    });
+  if (!gameId) {
+    return <GameForm api={api} />;
+  }
 
-    return () => api.close();
-  }, [api]);
-
-  const handleClick = card => {
-    const hidden = !card.hidden;
-    toggleHidden(card);
-    api.clickCard({ ...card, hidden });
-  };
-
-  return loading || error || !cards.length ? (
-    <Fallback loading={loading} error={error} cards={cards} />
-  ) : (
-    <>
-      {dead && <div className="winner">DEAD</div>}
-      {(!redRemaining || !blueRemaining) && !dead && (
-        <div
-          data-color={redRemaining ? colors.BLUE : colors.RED}
-          className="winner"
-        >
-          {redRemaining ? 'Blue' : 'Red'} Wins!
-        </div>
-      )}
-      <Grid>
-        {cards.map(({ word, color, hidden }) => (
-          <Card
-            key={word}
-            word={word}
-            color={color}
-            hidden={hidden}
-            isSpymaster={isSpymaster}
-            onClick={() => handleClick({ word, color, hidden })}
-          />
-        ))}
-      </Grid>
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'space-evenly',
-          alignItems: 'center',
-          margin: '1em',
-        }}
-      >
-        <span data-color={colors.RED} className="chip">
-          {redRemaining} left
-        </span>
-        <button className="btn" type="button" onClick={api.init}>
-          New game
-        </button>
-        <span data-color={colors.BLUE} className="chip">
-          {blueRemaining} left
-        </span>
-      </div>
-    </>
-  );
+  return <Game isSpymaster={getIsFreakmaster()} api={api} />;
 }
 
 App.propTypes = {
-  api: PropTypes.shape({
-    init: PropTypes.func.isRequired,
-    close: PropTypes.func.isRequired,
-    clickCard: PropTypes.func.isRequired,
-    onCardUpdates: PropTypes.func.isRequired,
-  }),
-  isSpymaster: PropTypes.bool,
+  gameId: PropTypes.string,
 };
 
 App.defaultProps = {
-  api: makeApi(),
-  isSpymaster: getIsFreakmaster(),
+  gameId: getGameId(),
 };
 
 export default App;
