@@ -25,7 +25,7 @@ const getRemaining = cards =>
     { redRemaining: 0, blueRemaining: 0 }
   );
 
-function Game({ api, isSpymaster }) {
+function Game({ api, isSpymaster, gameId }) {
   const [cards, setCards] = useState([]);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -105,6 +105,7 @@ function Game({ api, isSpymaster }) {
         <button className="btn" type="button" onClick={api.init}>
           New game
         </button>
+        <span>Game ID: {gameId}</span>
         <span data-color={colors.BLUE} className="chip">
           {blueRemaining} left
         </span>
@@ -115,6 +116,7 @@ function Game({ api, isSpymaster }) {
 
 Game.propTypes = {
   api: PropTypes.shape(apiShape),
+  gameId: PropTypes.string.isRequired,
   isSpymaster: PropTypes.bool,
 };
 

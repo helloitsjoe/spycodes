@@ -29,7 +29,7 @@ function App({ gameId }) {
     return <GameForm api={api} />;
   }
 
-  return <Game isSpymaster={getIsFreakmaster()} api={api} />;
+  return <Game isSpymaster={getIsFreakmaster()} api={api} gameId={gameId} />;
 }
 
 App.propTypes = {

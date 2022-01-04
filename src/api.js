@@ -11,7 +11,9 @@ import firebaseApp from './firebase';
 import { makeCards, toArray } from './cardData';
 
 const generateGameId = () => {
-  return 'ABCD';
+  const getRandomCap = () =>
+    String.fromCharCode(Math.floor(Math.random() * (90 - 65) + 65));
+  return `${getRandomCap()}${getRandomCap()}${getRandomCap()}${getRandomCap()}`;
 };
 
 export const apiShape = {
@@ -29,7 +31,7 @@ export const makeApi = (
   let unsub = () => {};
   // This could get a bit tricky setting initialGameId here but
   // checking for existence separately. TODO: Revisit this.
-  let gameId = initialGameId;
+  let gameId = initialGameId?.toUpperCase();
 
   const init = () => {
     if (cards) {
@@ -39,15 +41,23 @@ export const makeApi = (
     const cardsToSet = makeCards();
 
     if (!gameId) {
-      const generateAndSetGameId = () => {
+      const generateAndSetGameId = (retries = 5) => {
         const newId = generateGameId();
-        return getDoc(doc(db, `cards/${newId}`)).then(existingGameId => {
-          console.log(`existingGameId:`, existingGameId);
-          if (existingGameId) {
-            return generateAndSetGameId();
+        return getDoc(doc(db, `cards/${newId}`)).then(existingGame => {
+          console.log(`existingGameId:`, existingGame.data());
+          if (!retries) {
+            return Promise.reject(
+              new Error('Too many retries generating game')
+            );
           }
-          gameId = newId;
-          return setDoc(doc(db, `cards/${gameId}`), cardsToSet);
+          if (!existingGame.data()) {
+            gameId = newId;
+            // TODO: Add dateCreated for cleanup
+            return setDoc(doc(db, `cards/${gameId}`), cardsToSet).then(
+              () => gameId
+            );
+          }
+          return generateAndSetGameId(retries - 1);
         });
       };
 
