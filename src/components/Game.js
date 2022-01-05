@@ -91,24 +91,29 @@ function Game({ api, isSpymaster, gameId }) {
           />
         ))}
       </Grid>
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'space-evenly',
-          alignItems: 'center',
-          margin: '1em',
-        }}
-      >
-        <span data-color={colors.RED} className="chip">
-          {redRemaining} left
-        </span>
+      <div className="stack">
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'space-evenly',
+            alignItems: 'center',
+            margin: '1em',
+            width: '100%',
+          }}
+        >
+          <span data-color={colors.RED} className="chip">
+            {redRemaining} left
+          </span>
+          <span data-color={colors.DEFAULT} className="chip">
+            Game ID: {gameId}
+          </span>
+          <span data-color={colors.BLUE} className="chip">
+            {blueRemaining} left
+          </span>
+        </div>
         <button className="btn" type="button" onClick={api.init}>
-          New game
+          Start new game
         </button>
-        <span>Game ID: {gameId}</span>
-        <span data-color={colors.BLUE} className="chip">
-          {blueRemaining} left
-        </span>
       </div>
     </>
   );

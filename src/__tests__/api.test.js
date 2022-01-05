@@ -32,8 +32,9 @@ describe('makeApi', () => {
     api.init();
     expect(setDoc).toBeCalledWith('some-doc', expect.any(Object));
     expect(doc).toBeCalledWith(undefined, 'cards/ABCD');
-    const cards = setDoc.mock.calls[0][1];
-    Object.entries(cards).forEach(([word, card]) => {
+    const data = setDoc.mock.calls[0][1];
+    expect(data.createdAt).toEqual(expect.any(String));
+    Object.entries(data.cards).forEach(([word, card]) => {
       expect(word).toBe(card.word);
       expect(card).toEqual({
         word: expect.any(String),
@@ -57,7 +58,7 @@ describe('makeApi', () => {
     api.clickCard(singleCard);
     expect(setDoc).toBeCalledWith(
       'some-doc',
-      { poo: singleCard },
+      { cards: { poo: singleCard } },
       { merge: true }
     );
     expect(doc).toBeCalledWith(undefined, 'cards/ABCD');

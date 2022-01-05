@@ -23,7 +23,7 @@ describe('Game', () => {
     it('loads cards', () => {
       const singleCard = [{ color: RED, hidden: true, word: 'poo' }];
       const { container, findByTestId } = render(
-        <Game api={makeApi(GAME_ID, singleCard, null)} />
+        <Game api={makeApi(GAME_ID, singleCard, null)} gameId={GAME_ID} />
       );
       expect(container.textContent).toBe('Loading...');
       return findByTestId('card').then(card => {
@@ -33,7 +33,7 @@ describe('Game', () => {
 
     it('displays "No cards!" if no cards are fetched', () => {
       const { container, queryByTestId } = render(
-        <Game api={makeApi(GAME_ID, [])} />
+        <Game api={makeApi(GAME_ID, [])} gameId={GAME_ID} />
       );
       return waitFor(() => {
         expect(container.textContent).toBe('No cards!');
@@ -48,7 +48,9 @@ describe('Game', () => {
         onCardUpdates: fn => fn(new Error('No!')),
         clickCard: () => {},
       };
-      const { container, queryByTestId } = render(<Game api={mockApi} />);
+      const { container, queryByTestId } = render(
+        <Game api={mockApi} gameId={GAME_ID} />
+      );
       return waitFor(() => {
         expect(container.textContent).toBe('Error! No!');
         expect(queryByTestId('card')).toBe(null);
@@ -57,7 +59,7 @@ describe('Game', () => {
 
     it('all cards have default colors', () => {
       const { findAllByTestId } = render(
-        <Game api={makeApi(GAME_ID, makeCards())} />
+        <Game api={makeApi(GAME_ID, makeCards())} gameId={GAME_ID} />
       );
       return findAllByTestId('card').then(cards => {
         expect(cards.every(card => card.className.match('back default')));
@@ -67,7 +69,7 @@ describe('Game', () => {
     it('click reveals card color', () => {
       const singleCard = [{ color: RED, hidden: true, word: 'poo' }];
       const { findByText } = render(
-        <Game api={makeApi(GAME_ID, singleCard)} />
+        <Game api={makeApi(GAME_ID, singleCard)} gameId={GAME_ID} />
       );
       return findByText('POO').then(card => {
         expect(card.className).toBe('card back');
@@ -85,7 +87,7 @@ describe('Game', () => {
         { color: BLUE, hidden: true, word: 'bloo' },
       ];
       const { findAllByTestId } = render(
-        <Game api={makeApi(GAME_ID, mockCards)} />
+        <Game api={makeApi(GAME_ID, mockCards)} gameId={GAME_ID} />
       );
       return findAllByTestId('card').then(cards => {
         fireEvent.click(cards[0]);
@@ -101,7 +103,7 @@ describe('Game', () => {
         onCardUpdates: fn => fn(null, []),
         clickCard: () => {},
       };
-      const { unmount } = render(<Game api={mockApi} />);
+      const { unmount } = render(<Game api={mockApi} gameId={GAME_ID} />);
       return waitFor(() => {
         expect(mockApi.close).toBeCalledTimes(0);
       }).then(() => {
@@ -116,7 +118,7 @@ describe('Game', () => {
         { color: BLUE, hidden: true, word: 'bloo' },
         { color: BLUE, hidden: true, word: 'froo' },
       ];
-      render(<Game api={makeApi(GAME_ID, mockCards)} />);
+      render(<Game api={makeApi(GAME_ID, mockCards)} gameId={GAME_ID} />);
       return waitFor(() => {
         expect(screen.queryByText(/loading/i)).toBe(null);
       }).then(() => {
@@ -131,7 +133,7 @@ describe('Game', () => {
         { color: BLUE, hidden: true, word: 'bloo' },
         { color: BLUE, hidden: true, word: 'froo' },
       ];
-      render(<Game api={makeApi(GAME_ID, mockCards)} />);
+      render(<Game api={makeApi(GAME_ID, mockCards)} gameId={GAME_ID} />);
       return waitForElementToBeRemoved(() =>
         screen.queryByText(/loading/i)
       ).then(() => {
@@ -149,7 +151,7 @@ describe('Game', () => {
         { color: RED, hidden: true, word: 'bloo' },
         { color: RED, hidden: true, word: 'froo' },
       ];
-      render(<Game api={makeApi(GAME_ID, mockCards)} />);
+      render(<Game api={makeApi(GAME_ID, mockCards)} gameId={GAME_ID} />);
       return waitForElementToBeRemoved(() =>
         screen.queryByText(/loading/i)
       ).then(() => {
@@ -167,7 +169,7 @@ describe('Game', () => {
         { color: RED, hidden: true, word: 'bloo' },
         { color: BLACK, hidden: true, word: 'ded' },
       ];
-      render(<Game api={makeApi(GAME_ID, mockCards)} />);
+      render(<Game api={makeApi(GAME_ID, mockCards)} gameId={GAME_ID} />);
       return waitForElementToBeRemoved(() =>
         screen.queryByText(/loading/i)
       ).then(() => {
@@ -189,7 +191,7 @@ describe('Game', () => {
         onCardUpdates: fn => fn(null, singleCard),
         clickCard: () => {},
       };
-      render(<Game api={mockApi} />);
+      render(<Game api={mockApi} gameId={GAME_ID} />);
       expect(mockApi.init).not.toBeCalled();
       return screen.findByRole('button', { name: /new game/i }, button => {
         fireEvent.click(button);
@@ -201,7 +203,11 @@ describe('Game', () => {
   describe('spymaster', () => {
     it('cards have colors', () => {
       const { findAllByTestId } = render(
-        <Game api={makeApi(GAME_ID, makeCards())} isSpymaster />
+        <Game
+          api={makeApi(GAME_ID, makeCards())}
+          gameId={GAME_ID}
+          isSpymaster
+        />
       );
       return findAllByTestId('card').then(cards => {
         const matchesColor = color => card => card.dataset.color === color;
@@ -215,7 +221,11 @@ describe('Game', () => {
 
     it('clicking card does NOT hide it', () => {
       const { findAllByTestId } = render(
-        <Game api={makeApi(GAME_ID, makeCards())} isSpymaster />
+        <Game
+          api={makeApi(GAME_ID, makeCards())}
+          gameId={GAME_ID}
+          isSpymaster
+        />
       );
       return findAllByTestId('card').then(([firstCard]) => {
         expect(firstCard.className).not.toMatch(DEFAULT);

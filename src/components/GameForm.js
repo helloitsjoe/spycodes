@@ -20,10 +20,15 @@ function GameForm({ api }) {
   return (
     <>
       <form onSubmit={handleSubmit}>
-        <input
-          value={inputGameId}
-          onChange={e => setInputGameId(e.target.value)}
-        />
+        <div>
+          <label>
+            Enter a game ID to join:
+            <input
+              value={inputGameId}
+              onChange={e => setInputGameId(e.target.value.toUpperCase())}
+            />
+          </label>
+        </div>
         <button className="btn" type="submit">
           Join game
         </button>

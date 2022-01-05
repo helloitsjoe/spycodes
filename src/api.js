@@ -11,9 +11,9 @@ import firebaseApp from './firebase';
 import { makeCards, toArray } from './cardData';
 
 const generateGameId = () => {
-  const getRandomCap = () =>
+  const getCap = () =>
     String.fromCharCode(Math.floor(Math.random() * (90 - 65) + 65));
-  return `${getRandomCap()}${getRandomCap()}${getRandomCap()}${getRandomCap()}`;
+  return `${getCap()}${getCap()}${getCap()}${getCap()}`;
 };
 
 export const apiShape = {
@@ -53,9 +53,10 @@ export const makeApi = (
           if (!existingGame.data()) {
             gameId = newId;
             // TODO: Add dateCreated for cleanup
-            return setDoc(doc(db, `cards/${gameId}`), cardsToSet).then(
-              () => gameId
-            );
+            return setDoc(doc(db, `cards/${gameId}`), {
+              cards: cardsToSet,
+              createdAt: new Date().toISOString(),
+            }).then(() => gameId);
           }
           return generateAndSetGameId(retries - 1);
         });
@@ -65,13 +66,13 @@ export const makeApi = (
     }
 
     console.log(`setting cards:`, cardsToSet);
-    return setDoc(doc(db, `cards/${gameId}`), cardsToSet);
-    // Create ID, check for it
+    return setDoc(doc(db, `cards/${gameId}`), {
+      cards: cardsToSet,
+      createdAt: new Date().toISOString(),
+    });
   };
 
-  const gameExists = id => {
-    return getDoc(doc(db, `cards/${id}`));
-  };
+  const gameExists = id => getDoc(doc(db, `cards/${id}`));
 
   const onCardUpdates = fn => {
     if (cards) {
@@ -85,11 +86,12 @@ export const makeApi = (
 
     unsub = onSnapshot(
       doc(db, `cards/${gameId}`),
-      newCards => {
-        if (!newCards.data()) {
+      snapshot => {
+        if (!snapshot.data()) {
           fn(new Error(`Game ${gameId} does not exist`));
         }
-        const ordered = toArray(newCards.data());
+        const { cards: newCards } = snapshot.data();
+        const ordered = toArray(newCards);
         console.log(`new cards:`, ordered);
         fn(null, ordered);
       },
@@ -100,12 +102,14 @@ export const makeApi = (
     );
   };
 
-  const close = () => {
-    unsub();
-  };
+  const close = () => unsub();
 
   const clickCard = card => {
-    setDoc(doc(db, `cards/${gameId}`), { [card.word]: card }, { merge: true });
+    setDoc(
+      doc(db, `cards/${gameId}`),
+      { cards: { [card.word]: card } },
+      { merge: true }
+    );
   };
 
   return {
