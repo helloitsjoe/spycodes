@@ -1,19 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { makeApi } from './api';
+import { getIsSpyMaster, getGameId } from './window-utils';
 import Game from './components/Game';
 import GameForm from './components/GameForm';
-
-const getIsFreakmaster = () =>
-  window && window.location.pathname.includes('freakmaster');
-
-const getGameId = () => {
-  console.log(`window.location.query:`, window.location.search);
-  const params = new URLSearchParams(window.location.search);
-  const game = params.get('game');
-  console.log(`params, game:`, params, game);
-  return game;
-};
 
 function App({ gameId }) {
   const api = makeApi(gameId);
@@ -29,7 +19,7 @@ function App({ gameId }) {
     return <GameForm api={api} />;
   }
 
-  return <Game isSpymaster={getIsFreakmaster()} api={api} gameId={gameId} />;
+  return <Game isSpymaster={getIsSpyMaster()} api={api} gameId={gameId} />;
 }
 
 App.propTypes = {
