@@ -9,12 +9,7 @@ import {
 } from 'firebase/firestore';
 import firebaseApp from './firebase';
 import { makeCards, toArray } from './cardData';
-
-const generateGameId = () => {
-  const getCap = () =>
-    String.fromCharCode(Math.floor(Math.random() * (90 - 65) + 65));
-  return `${getCap()}${getCap()}${getCap()}${getCap()}`;
-};
+import { generateGameId } from './utils';
 
 export const apiShape = {
   init: PropTypes.func.isRequired,
@@ -29,8 +24,6 @@ export const makeApi = (
   db = getFirestore(firebaseApp)
 ) => {
   let unsub = () => {};
-  // This could get a bit tricky setting initialGameId here but
-  // checking for existence separately. TODO: Revisit this.
   let gameId = initialGameId?.toUpperCase();
 
   const init = () => {
@@ -40,36 +33,32 @@ export const makeApi = (
 
     const cardsToSet = makeCards();
 
-    if (!gameId) {
-      const generateAndSetGameId = (retries = 5) => {
-        const newId = generateGameId();
-        return getDoc(doc(db, `cards/${newId}`)).then(existingGame => {
-          console.log(`existingGameId:`, existingGame.data());
-          if (!retries) {
-            return Promise.reject(
-              new Error('Too many retries generating game')
-            );
-          }
-          if (!existingGame.data()) {
-            gameId = newId;
-            // TODO: Add dateCreated for cleanup
-            return setDoc(doc(db, `cards/${gameId}`), {
-              cards: cardsToSet,
-              createdAt: new Date().toISOString(),
-            }).then(() => gameId);
-          }
-          return generateAndSetGameId(retries - 1);
-        });
-      };
-
-      return generateAndSetGameId();
+    if (gameId) {
+      // console.log(`setting cards:`, cardsToSet);
+      return setDoc(doc(db, `cards/${gameId}`), {
+        cards: cardsToSet,
+        createdAt: new Date().toISOString(),
+      });
     }
 
-    console.log(`setting cards:`, cardsToSet);
-    return setDoc(doc(db, `cards/${gameId}`), {
-      cards: cardsToSet,
-      createdAt: new Date().toISOString(),
-    });
+    const generateAndSetGameId = (retries = 5) => {
+      const newId = generateGameId();
+      return getDoc(doc(db, `cards/${newId}`)).then(existingGame => {
+        if (!retries) {
+          return Promise.reject(new Error('Too many retries generating game'));
+        }
+        if (!existingGame.data()) {
+          gameId = newId;
+          return setDoc(doc(db, `cards/${gameId}`), {
+            cards: cardsToSet,
+            createdAt: new Date().toISOString(),
+          }).then(() => gameId);
+        }
+        return generateAndSetGameId(retries - 1);
+      });
+    };
+
+    return generateAndSetGameId();
   };
 
   const gameExists = id => getDoc(doc(db, `cards/${id}`));

@@ -8,3 +8,9 @@ export const getGameId = () => {
   console.log(`params, game:`, params, game);
   return game;
 };
+
+export const generateGameId = () => {
+  const getCap = () =>
+    String.fromCharCode(Math.floor(Math.random() * (90 - 65) + 65));
+  return `${getCap()}${getCap()}${getCap()}${getCap()}`;
+};

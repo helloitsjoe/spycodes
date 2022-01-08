@@ -1,16 +1,5 @@
 import React from 'react';
-import {
-  render,
-  screen,
-  fireEvent,
-  waitFor,
-  waitForElementToBeRemoved,
-} from '@testing-library/react';
-import Game from '../components/Game';
-import Fallback from '../components/Fallback';
-import Card from '../components/Card';
-import { colors, makeCards } from '../cardData';
-import { makeApi } from '../api';
+import { render, screen } from '@testing-library/react';
 
 jest.mock('firebase/firestore');
 jest.mock('../firebase');
