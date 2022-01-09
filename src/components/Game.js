@@ -70,11 +70,11 @@ function Game({ api, isSpymaster, gameId }) {
     <Fallback loading={loading} error={error} cards={cards} />
   ) : (
     <>
-      {dead && <div className="winner">DEAD</div>}
+      {dead && <div className="banner">DEAD</div>}
       {(!redRemaining || !blueRemaining) && !dead && (
         <div
           data-color={redRemaining ? colors.BLUE : colors.RED}
-          className="winner"
+          className="banner"
         >
           {redRemaining ? 'Blue' : 'Red'} Wins!
         </div>

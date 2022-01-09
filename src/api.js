@@ -61,7 +61,13 @@ export const makeApi = (
     return generateAndSetGameId();
   };
 
-  const gameExists = id => getDoc(doc(db, `cards/${id}`));
+  const gameExists = () =>
+    getDoc(doc(db, `cards/${gameId}`))
+      .then(snapshot => !!snapshot.data())
+      .catch(err => {
+        console.error(err);
+        return false;
+      });
 
   const onCardUpdates = fn => {
     if (cards) {

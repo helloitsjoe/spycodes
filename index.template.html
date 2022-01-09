@@ -51,13 +51,15 @@
       display: flex;
       flex-direction: column;
       justify-content: center;
-      max-width: 540px;
-      margin: auto;
-      height: 100vh;
+      align-items: center;
+      max-width: 440px;
+      margin: 1em auto
+      /* height: 100%; */
     }
 
     form * {
       margin-top: 1em;
+      width: 100%;
     }
 
     input {
@@ -140,7 +142,7 @@
       transition: all 0.3s;
     }
 
-    .winner {
+    .banner {
       margin: 1em auto;
       text-align: center;
       color: var(--primary-color);
@@ -153,9 +155,13 @@
     .stack {
       display: flex;
       flex-direction: column;
-      justify-content: center;
+      justify-content: space-between;
       align-items: center;
-      margin: 1em;
+      /* margin: 1em; */
+    }
+
+    .full-height {
+      height: 100vh;
     }
 
     /* Medium */

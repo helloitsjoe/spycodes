@@ -18,25 +18,24 @@ function GameForm({ api }) {
   };
 
   return (
-    <>
-      <form onSubmit={handleSubmit}>
-        <div>
-          <label>
-            Enter a game ID to join:
-            <input
-              value={inputGameId}
-              onChange={e => setInputGameId(e.target.value.toUpperCase())}
-            />
-          </label>
-        </div>
-        <button className="btn" type="submit">
-          Join game
-        </button>
-        <button className="btn" type="submit">
-          Start new game
-        </button>
-      </form>
-    </>
+    <form onSubmit={handleSubmit} className="stack">
+      <div>
+        <label>
+          Enter a game ID to join:
+          <input
+            value={inputGameId}
+            onChange={e => setInputGameId(e.target.value.toUpperCase())}
+          />
+        </label>
+      </div>
+      <button className="btn" type="submit">
+        Join game
+      </button>
+      <div>or!</div>
+      <button className="btn" type="submit">
+        Start new game
+      </button>
+    </form>
   );
 }
 
