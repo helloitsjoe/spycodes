@@ -58,7 +58,14 @@ describe('makeApi', () => {
     expect(gameId).toBe(GAME_ID);
   });
 
-  it.todo('if initial game ID is used, init sets new cards using that ID');
+  it('if initial game ID is used, init sets new cards using that ID', async () => {
+    const api = makeApi('1234');
+    const gameId = await api.init();
+    expect(getDoc).not.toBeCalled();
+    expect(setDoc).toBeCalledWith('some-doc', expect.any(Object));
+    expect(doc.mock.calls[0][1]).toMatch(`cards/1234`);
+    expect(gameId).toBe('1234');
+  });
 
   it('init gives up generating ID after retries', async () => {
     getDoc.mockResolvedValue({ data: () => 'some-game' });

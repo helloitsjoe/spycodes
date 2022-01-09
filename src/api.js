@@ -38,7 +38,7 @@ export const makeApi = (
       return setDoc(doc(db, `cards/${gameId}`), {
         cards: cardsToSet,
         createdAt: new Date().toISOString(),
-      });
+      }).then(() => gameId);
     }
 
     const generateAndSetGameId = (retries = 5) => {
