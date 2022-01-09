@@ -12,7 +12,7 @@ export const makeApi = (cards, db = getFirestore(firebaseApp)) => {
     }
     // TODO: Handle more than one game
     const cardsToSet = makeCards();
-    console.log(`setting cards:`, cardsToSet);
+    // console.log(`setting cards:`, cardsToSet);
     return setDoc(doc(db, `cards/current`), cardsToSet);
   };
 
