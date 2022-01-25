@@ -43,7 +43,7 @@ export const makeApi = (
 
     const generateAndSetGameId = (retries = 5) => {
       const newId = generateGameId();
-      return getDoc(doc(db, `cards/${newId}`)).then(existingGame => {
+      return getDoc(doc(db, `cards/${newId}`)).then((existingGame) => {
         if (!retries) {
           return Promise.reject(new Error('Too many retries generating game'));
         }
@@ -63,13 +63,13 @@ export const makeApi = (
 
   const gameExists = () =>
     getDoc(doc(db, `cards/${gameId}`))
-      .then(snapshot => !!snapshot.data())
-      .catch(err => {
+      .then((snapshot) => !!snapshot.data())
+      .catch((err) => {
         console.error(err);
         return false;
       });
 
-  const onCardUpdates = fn => {
+  const onCardUpdates = (fn) => {
     if (cards) {
       // TODO: This is kinda wonky. Probably easier to remove `cards`
       // as an arg and just mock the whole API in tests
@@ -81,7 +81,7 @@ export const makeApi = (
 
     unsub = onSnapshot(
       doc(db, `cards/${gameId}`),
-      snapshot => {
+      (snapshot) => {
         if (!snapshot.data()) {
           fn(new Error(`Game ${gameId} does not exist`));
         }
@@ -90,7 +90,7 @@ export const makeApi = (
         console.log(`new cards:`, ordered);
         fn(null, ordered);
       },
-      err => {
+      (err) => {
         console.error(err);
         fn(err, null);
       }
@@ -99,7 +99,7 @@ export const makeApi = (
 
   const close = () => unsub();
 
-  const clickCard = card => {
+  const clickCard = (card) => {
     setDoc(
       doc(db, `cards/${gameId}`),
       { cards: { [card.word]: card } },
