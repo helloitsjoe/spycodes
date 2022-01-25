@@ -1,16 +1,16 @@
-import React from 'react';
-import {
+const React = require('react');
+const {
   render,
   screen,
   fireEvent,
   waitFor,
   waitForElementToBeRemoved,
-} from '@testing-library/react';
-import Game from '../components/Game';
-import Fallback from '../components/Fallback';
-import Card from '../components/Card';
-import { colors, makeCards } from '../cardData';
-import { makeApi } from '../api';
+} = require('@testing-library/react');
+const { default: Game } = require('../components/Game');
+const { default: Fallback } = require('../components/Fallback');
+const { default: Card } = require('../components/Card');
+const { colors, makeCards } = require('../cardData');
+const { makeApi } = require('../api');
 
 jest.mock('firebase/firestore');
 jest.mock('../firebase');
@@ -26,7 +26,7 @@ describe('Game', () => {
         <Game api={makeApi(GAME_ID, singleCard, null)} gameId={GAME_ID} />
       );
       expect(container.textContent).toBe('Loading...');
-      return findByTestId('card').then(card => {
+      return findByTestId('card').then((card) => {
         expect(card.textContent).toBe('POO');
       });
     });
@@ -45,7 +45,7 @@ describe('Game', () => {
       const mockApi = {
         init() {},
         close() {},
-        onCardUpdates: fn => fn(new Error('No!')),
+        onCardUpdates: (fn) => fn(new Error('No!')),
         clickCard: () => {},
       };
       const { container, queryByTestId } = render(
@@ -61,8 +61,8 @@ describe('Game', () => {
       const { findAllByTestId } = render(
         <Game api={makeApi(GAME_ID, makeCards())} gameId={GAME_ID} />
       );
-      return findAllByTestId('card').then(cards => {
-        expect(cards.every(card => card.className.match('back default')));
+      return findAllByTestId('card').then((cards) => {
+        expect(cards.every((card) => card.className.match('back default')));
       });
     });
 
@@ -71,7 +71,7 @@ describe('Game', () => {
       const { findByText } = render(
         <Game api={makeApi(GAME_ID, singleCard)} gameId={GAME_ID} />
       );
-      return findByText('POO').then(card => {
+      return findByText('POO').then((card) => {
         expect(card.className).toBe('card back');
         expect(card.dataset.color).toBe(DEFAULT);
         fireEvent.click(card);
@@ -89,7 +89,7 @@ describe('Game', () => {
       const { findAllByTestId } = render(
         <Game api={makeApi(GAME_ID, mockCards)} gameId={GAME_ID} />
       );
-      return findAllByTestId('card').then(cards => {
+      return findAllByTestId('card').then((cards) => {
         fireEvent.click(cards[0]);
         expect(cards[0].className).toMatch('front');
         expect(cards[1].className).not.toMatch('front');
@@ -100,7 +100,7 @@ describe('Game', () => {
       const mockApi = {
         init: jest.fn(),
         close: jest.fn(),
-        onCardUpdates: fn => fn(null, []),
+        onCardUpdates: (fn) => fn(null, []),
         clickCard: () => {},
       };
       const { unmount } = render(<Game api={mockApi} gameId={GAME_ID} />);
@@ -188,12 +188,12 @@ describe('Game', () => {
       const mockApi = {
         init: jest.fn(),
         close() {},
-        onCardUpdates: fn => fn(null, singleCard),
+        onCardUpdates: (fn) => fn(null, singleCard),
         clickCard: () => {},
       };
       render(<Game api={mockApi} gameId={GAME_ID} />);
       expect(mockApi.init).not.toBeCalled();
-      return screen.findByRole('button', { name: /new game/i }, button => {
+      return screen.findByRole('button', { name: /new game/i }, (button) => {
         fireEvent.click(button);
         expect(mockApi.init).toBeCalled();
       });
@@ -209,8 +209,8 @@ describe('Game', () => {
           isSpymaster
         />
       );
-      return findAllByTestId('card').then(cards => {
-        const matchesColor = color => card => card.dataset.color === color;
+      return findAllByTestId('card').then((cards) => {
+        const matchesColor = (color) => (card) => card.dataset.color === color;
         expect(cards.some(matchesColor(RED))).toBe(true);
         expect(cards.some(matchesColor(BLUE))).toBe(true);
         expect(cards.some(matchesColor(YELLOW))).toBe(true);

@@ -1,7 +1,7 @@
-import { onSnapshot, setDoc, getDoc, doc } from 'firebase/firestore';
-import { makeApi } from '../api';
-import { colors } from '../cardData';
-import { generateGameId } from '../utils';
+const { onSnapshot, setDoc, getDoc, doc } = require('firebase/firestore');
+const { makeApi } = require('../api');
+const { colors } = require('../cardData');
+const { generateGameId } = require('../utils');
 
 jest.mock('firebase/firestore');
 jest.mock('../utils');

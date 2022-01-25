@@ -1,4 +1,4 @@
-import { withColors, withWords, makeCards, colors } from '../cardData';
+const { withColors, withWords, makeCards, colors } = require('../cardData');
 
 const { RED, BLUE, BLACK, DEFAULT, YELLOW } = colors;
 
@@ -8,7 +8,7 @@ describe('withColors', () => {
   it('adds colors', () => {
     const { cards } = withColors({ cards: base });
     expect(cards).toMatchObject(base);
-    expect(cards.every(card => card.hasOwnProperty('color')));
+    expect(cards.every((card) => card.hasOwnProperty('color')));
   });
 
   it.each`
@@ -29,7 +29,7 @@ describe('withColors', () => {
     const { cards } = withColors({ cards: base });
     const { cards: cardsTwo } = withColors({ cards });
     expect(cards).not.toEqual(cardsTwo);
-    cards.every(card => cardsTwo.includes(card));
+    cards.every((card) => cardsTwo.includes(card));
   });
 });
 
@@ -37,8 +37,8 @@ describe('withWords', () => {
   it('adds words', () => {
     const { cards } = withWords({ cards: base });
     expect(cards).toMatchObject(base);
-    expect(cards.every(card => card.hasOwnProperty('word'))).toBe(true);
-    expect(cards.some(card => card.word == null)).toBe(false);
+    expect(cards.every((card) => card.hasOwnProperty('word'))).toBe(true);
+    expect(cards.some((card) => card.word == null)).toBe(false);
   });
 });
 
