@@ -1,131 +1,58 @@
-import React, { useState, useLayoutEffect } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
-import Grid from './components/Grid';
-import Card from './components/Card';
-import Fallback from './components/Fallback';
-import { colors } from './cardData';
 import { makeApi } from './api';
+import { getIsSpyMaster, getGameId } from './utils';
+import Game from './components/Game';
+import GameForm from './components/GameForm';
+import { colors } from './cardData';
 
-const getIsFreakmaster = () =>
-  window && window.location.pathname.includes('freakmaster');
+function App({ gameId }) {
+  const api = makeApi(gameId);
 
-const getRemaining = cards =>
-  cards.reduce(
-    (acc, { color, hidden }) => {
-      if (!hidden) {
-        return acc;
-      }
-      if (color === colors.RED) {
-        acc.redRemaining++;
-      } else if (color === colors.BLUE) {
-        acc.blueRemaining++;
-      }
-      return acc;
-    },
-    { redRemaining: 0, blueRemaining: 0 }
-  );
+  const [loading, setLoading] = React.useState(!!gameId);
+  const [errorMessage, setErrorMessage] = React.useState('');
 
-function App({ api, isSpymaster }) {
-  const [cards, setCards] = useState([]);
-  const [error, setError] = useState(null);
-  const [loading, setLoading] = useState(false);
-
-  const { redRemaining, blueRemaining } = getRemaining(cards);
-  const dead = cards.find(
-    ({ color, hidden }) => color === colors.BLACK && !hidden
-  );
-
-  const toggleHidden = ({ word }) => {
-    setCards(c =>
-      c.map(card => {
-        if (card.word === word) {
-          return { ...card, hidden: !card.hidden };
+  React.useEffect(() => {
+    if (gameId) {
+      api.gameExists(gameId).then(exists => {
+        console.log(`exists:`, exists);
+        if (!exists) {
+          setErrorMessage(`Game ${gameId} does not exist!`);
         }
-        return card;
-      })
-    );
-  };
+        setLoading(false);
+      });
+    }
+  }, [gameId, api]);
+  console.log(`loading, errorMessage:`, loading, errorMessage);
 
-  useLayoutEffect(() => {
-    setLoading(true);
-    api.onCardUpdates((err, newCards) => {
-      setLoading(false);
-      if (err) {
-        setError(err);
-        return;
-      }
-      setCards(newCards);
-    });
-
-    return () => api.close();
-  }, [api]);
-
-  const handleClick = card => {
-    const hidden = !card.hidden;
-    toggleHidden(card);
-    api.clickCard({ ...card, hidden });
-  };
-
-  return loading || error || !cards.length ? (
-    <Fallback loading={loading} error={error} cards={cards} />
-  ) : (
-    <>
-      {dead && <div className="winner">DEAD</div>}
-      {(!redRemaining || !blueRemaining) && !dead && (
-        <div
-          data-color={redRemaining ? colors.BLUE : colors.RED}
-          className="winner"
-        >
-          {redRemaining ? 'Blue' : 'Red'} Wins!
+  if (errorMessage) {
+    return (
+      <>
+        <div className="banner" data-color={colors.RED}>
+          {errorMessage}
         </div>
-      )}
-      <Grid>
-        {cards.map(({ word, color, hidden }) => (
-          <Card
-            key={word}
-            word={word}
-            color={color}
-            hidden={hidden}
-            isSpymaster={isSpymaster}
-            onClick={() => handleClick({ word, color, hidden })}
-          />
-        ))}
-      </Grid>
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'space-evenly',
-          alignItems: 'center',
-          margin: '1em',
-        }}
-      >
-        <span data-color={colors.RED} className="chip">
-          {redRemaining} left
-        </span>
-        <button className="btn" type="button" onClick={api.init}>
-          New game
-        </button>
-        <span data-color={colors.BLUE} className="chip">
-          {blueRemaining} left
-        </span>
-      </div>
-    </>
-  );
+        <GameForm api={api} />;
+      </>
+    );
+  }
+
+  if (loading) {
+    return <div className="banner">Loading...</div>;
+  }
+
+  if (!gameId) {
+    return <GameForm api={api} />;
+  }
+
+  return <Game isSpymaster={getIsSpyMaster()} api={api} gameId={gameId} />;
 }
 
 App.propTypes = {
-  api: PropTypes.shape({
-    init: PropTypes.func.isRequired,
-    close: PropTypes.func.isRequired,
-    clickCard: PropTypes.func.isRequired,
-    onCardUpdates: PropTypes.func.isRequired,
-  }),
-  isSpymaster: PropTypes.bool,
+  gameId: PropTypes.string,
 };
 
 App.defaultProps = {
-  api: makeApi(),
-  isSpymaster: getIsFreakmaster(),
+  gameId: getGameId(),
 };
 
 export default App;
