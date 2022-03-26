@@ -1,6 +1,6 @@
 const { many, official, basic } = require('../resources/words.json');
 
-const compose = (...args) => data => args.reduce((acc, fn) => fn(acc), data);
+const compose = (...args) => (data) => args.reduce((acc, fn) => fn(acc), data);
 
 const colors = {
   RED: 'red',
@@ -13,7 +13,7 @@ const colors = {
 
 const LENGTH = 25;
 
-const shuffle = array => {
+const shuffle = (array) => {
   for (let i = array.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
     // eslint-disable-next-line no-param-reassign
@@ -22,11 +22,11 @@ const shuffle = array => {
   return array;
 };
 
-const toArray = data => {
+const toArray = (data) => {
   return Object.values(data).sort((a, b) => (a.word > b.word ? 1 : -1));
 };
 
-const toObject = data => {
+const toObject = (data) => {
   return data.reduce((acc, curr) => {
     acc[curr.word] = curr;
     return acc;
@@ -57,7 +57,7 @@ const withColors = ({ cards, chance = Math.random() }) => {
 const withWords = ({ cards }) => {
   const allWords = [...new Set([...many, ...official, ...basic])];
   const words = shuffle(allWords);
-  const worded = cards.map(box => ({ ...box, word: words.pop() }));
+  const worded = cards.map((box) => ({ ...box, word: words.pop() }));
   return { cards: shuffle(worded) };
 };
 

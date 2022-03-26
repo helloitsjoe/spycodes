@@ -5,12 +5,12 @@ import { apiShape } from '../api';
 function GameForm({ api }) {
   const [inputGameId, setInputGameId] = React.useState('');
 
-  const handleSubmit = e => {
+  const handleSubmit = (e) => {
     e.preventDefault();
     console.log(`maybeId:`, inputGameId);
     const promise = inputGameId ? () => Promise.resolve(inputGameId) : api.init;
 
-    return promise().then(id => {
+    return promise().then((id) => {
       const url = new URL(window.location.href);
       url.searchParams.set('game', id);
       window.location.assign(url);
@@ -24,7 +24,7 @@ function GameForm({ api }) {
           Enter a game ID to join:
           <input
             value={inputGameId}
-            onChange={e => setInputGameId(e.target.value.toUpperCase())}
+            onChange={(e) => setInputGameId(e.target.value.toUpperCase())}
           />
         </label>
       </div>

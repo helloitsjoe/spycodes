@@ -1,6 +1,3 @@
-const React = require('react');
-const { render, screen } = require('@testing-library/react');
-
 jest.mock('firebase/firestore');
 jest.mock('../firebase');
 

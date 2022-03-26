@@ -9,7 +9,7 @@ import { makeApi, apiShape } from '../api';
 const getIsFreakmaster = () =>
   window && window.location.pathname.includes('freakmaster');
 
-const getRemaining = cards =>
+const getRemaining = (cards) =>
   cards.reduce(
     (acc, { color, hidden }) => {
       if (!hidden) {
@@ -36,8 +36,8 @@ function Game({ api, isSpymaster, gameId }) {
   );
 
   const toggleHidden = ({ word }) => {
-    setCards(c =>
-      c.map(card => {
+    setCards((c) =>
+      c.map((card) => {
         if (card.word === word) {
           return { ...card, hidden: !card.hidden };
         }
@@ -60,7 +60,7 @@ function Game({ api, isSpymaster, gameId }) {
     return () => api.close();
   }, [api]);
 
-  const handleClick = card => {
+  const handleClick = (card) => {
     const hidden = !card.hidden;
     toggleHidden(card);
     api.clickCard({ ...card, hidden });
