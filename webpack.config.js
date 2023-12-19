@@ -13,7 +13,7 @@ module.exports = makeWebpackConfig({
     }),
     new HtmlWebpackPlugin({
       template: 'index.template.html',
-      filename: 'freakmaster/index.html',
+      filename: 'spymaster/index.html',
     }),
   ],
 });

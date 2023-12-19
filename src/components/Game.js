@@ -4,10 +4,8 @@ import Grid from './Grid';
 import Card from './Card';
 import Fallback from './Fallback';
 import { colors } from '../cardData';
+import { getIsSpyMaster } from '../utils';
 import { makeApi, apiShape } from '../api';
-
-const getIsFreakmaster = () =>
-  window && window.location.pathname.includes('freakmaster');
 
 const getRemaining = (cards) =>
   cards.reduce(
@@ -127,7 +125,7 @@ Game.propTypes = {
 
 Game.defaultProps = {
   api: makeApi(),
-  isSpymaster: getIsFreakmaster(),
+  isSpymaster: getIsSpyMaster(),
 };
 
 export default Game;
