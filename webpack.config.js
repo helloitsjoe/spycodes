@@ -1,10 +1,18 @@
-const ip = require('ip');
-const { makeWebpackConfig } = require('webpack-simple');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
-module.exports = makeWebpackConfig({
+module.exports = {
+  mode: 'development',
   devServer: {
-    host: ip.address(),
+    host: '0.0.0.0',
+  },
+  module: {
+    rules: [
+      {
+        test: /\.jsx?$/,
+        exclude: /node_modules/,
+        loader: 'babel-loader',
+      },
+    ],
   },
   plugins: [
     new HtmlWebpackPlugin({
@@ -16,4 +24,4 @@ module.exports = makeWebpackConfig({
       filename: 'spymaster/index.html',
     }),
   ],
-});
+};
