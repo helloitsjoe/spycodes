@@ -21,6 +21,8 @@ describe('App', () => {
     mockApi = {
       gameExists: jest.fn().mockResolvedValue(true),
       onCardUpdates: (fn) => fn(null, toArray(makeCards())),
+      init() {},
+      clickCard() {},
       close: jest.fn(),
     };
   });
@@ -36,7 +38,12 @@ describe('App', () => {
     expect(screen.getByText(/123/i)).toBeTruthy();
   });
 
-  it.todo('shows form if ID is NOT in URL');
+  it('shows form if ID is NOT in URL', async () => {
+    window.location = new URL('http://localhost');
+    render(<App api={mockApi} />);
+    expect(screen.getByLabelText(/enter a game id to join/i)).toBeTruthy();
+  });
+
   it.todo('fetches existing game if ID is in URL');
   it.todo('fetches existing game if ID is submitted in form');
   it.todo('creates new game if no ID');

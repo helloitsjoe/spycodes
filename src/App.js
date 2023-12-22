@@ -12,9 +12,7 @@ function App({ gameId = getGameId(), api = makeApi(gameId) }) {
 
   React.useEffect(() => {
     if (gameId) {
-      console.log('here');
       api.gameExists(gameId).then((exists) => {
-        console.log(`exists:`, exists);
         if (!exists) {
           setErrorMessage(`Game ${gameId} does not exist!`);
         }
