@@ -1,19 +1,18 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { makeApi } from './api';
 import { getIsSpyMaster, getGameId } from './utils';
 import Game from './components/Game';
 import GameForm from './components/GameForm';
 import { colors } from './cardData';
 
-function App({ gameId }) {
-  const api = makeApi(gameId);
-
+// eslint-disable-next-line react/prop-types
+function App({ gameId = getGameId(), api = makeApi(gameId) }) {
   const [loading, setLoading] = React.useState(!!gameId);
   const [errorMessage, setErrorMessage] = React.useState('');
 
   React.useEffect(() => {
     if (gameId) {
+      console.log('here');
       api.gameExists(gameId).then((exists) => {
         console.log(`exists:`, exists);
         if (!exists) {
@@ -46,13 +45,5 @@ function App({ gameId }) {
 
   return <Game isSpymaster={getIsSpyMaster()} api={api} gameId={gameId} />;
 }
-
-App.propTypes = {
-  gameId: PropTypes.string,
-};
-
-App.defaultProps = {
-  gameId: getGameId(),
-};
 
 export default App;
