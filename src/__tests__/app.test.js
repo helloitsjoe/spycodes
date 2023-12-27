@@ -17,7 +17,7 @@ describe('App', () => {
   beforeEach(() => {
     originalLocation = window.location;
     delete window.location;
-    window.location = new URL('http://localhost?game=123');
+
     mockApi = {
       init() {},
       clickCard() {},
@@ -33,6 +33,7 @@ describe('App', () => {
   });
 
   it('shows game if ID is in URL', async () => {
+    window.location = new URL('http://localhost?game=123');
     render(<App api={mockApi} />);
     await waitForElementToBeRemoved(() => screen.getByText(/Loading/i));
     expect(screen.getByText(/game id: 123/i)).toBeTruthy();
