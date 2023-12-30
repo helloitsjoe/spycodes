@@ -2,6 +2,8 @@ import React from 'react';
 import {
   screen,
   render,
+  fireEvent,
+  waitFor,
   waitForElementToBeRemoved,
 } from '@testing-library/react';
 import { makeCards, toArray } from '../cardData';
@@ -52,6 +54,22 @@ describe('App', () => {
     expect(screen.getByText(/game id: 123/i)).toBeTruthy();
   });
 
-  it.todo('fetches existing game if ID is submitted in form');
+  it('fetches existing game if ID is submitted in form', async () => {
+    window.location = new URL('http://localhost');
+    window.location.assign = jest.fn();
+    render(<App api={mockApi} />);
+    fireEvent.change(screen.getByLabelText(/enter a game id to join/i), {
+      target: { value: '123' },
+    });
+    fireEvent.submit(screen.getByText(/join game/i));
+
+    const url = new URL('http://localhost/');
+    url.searchParams.set('game', '123');
+
+    await waitFor(() => {
+      expect(window.location.assign).toBeCalledWith(url);
+    });
+  });
+
   it.todo('creates new game if no ID');
 });
