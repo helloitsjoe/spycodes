@@ -21,9 +21,9 @@ describe('App', () => {
     delete window.location;
 
     mockApi = {
-      init() {},
       clickCard() {},
       close: jest.fn(),
+      init: jest.fn().mockResolvedValue(),
       gameExists: jest.fn().mockResolvedValue(true),
       onCardUpdates: (fn) => fn(null, toArray(makeCards())),
     };
@@ -69,7 +69,22 @@ describe('App', () => {
     await waitFor(() => {
       expect(window.location.assign).toBeCalledWith(url);
     });
+    expect(mockApi.init).not.toBeCalled();
   });
 
-  it.todo('creates new game if no ID');
+  it('creates new game if no ID', async () => {
+    window.location = new URL('http://localhost');
+    window.location.assign = jest.fn();
+    mockApi.init.mockResolvedValue('XYZ');
+    render(<App api={mockApi} />);
+    fireEvent.submit(screen.getByText(/start new game/i));
+
+    const url = new URL('http://localhost/');
+    url.searchParams.set('game', 'XYZ');
+
+    await waitFor(() => {
+      expect(window.location.assign).toBeCalledWith(url);
+    });
+    expect(mockApi.init).toBeCalled();
+  });
 });
